@@ -1,12 +1,13 @@
-import 'package:bus_app/map_page.dart';
+import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:bus_app/src/features/home_page/presentation/page/home_page.dart';
+import 'package:bus_app/src/features/profile/presentation/page/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
 
   @override
-  _NavPageState createState() => _NavPageState();
+  State<NavPage> createState() => _NavPageState();
 }
 
 class _NavPageState extends State<NavPage> {
@@ -15,8 +16,7 @@ class _NavPageState extends State<NavPage> {
   static const List<Widget> _widgetOptions = <Widget>[
     HomePage(),
     MapPage(),
-    Text('Profile Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {

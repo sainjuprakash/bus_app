@@ -20,16 +20,35 @@ class _MapPageState extends State<MapPage> {
   static const LatLng _pGooglePxl = LatLng(27.6898595779013, 85.32115165103747);
   static const LatLng _destination =
       LatLng(27.675462605326324, 85.4300373952178);
-  LatLng? currentP = null;
+  LatLng? currentP;
+  double currentZoom = 18.0;
+  List<LatLng> _polylineCoordinates = [];
+  Set<Circle> circles = {};
   Map<PolylineId, Polyline> polylines = {};
+
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    getLocationUpdates().then((_) => {
-          getPolylinePoints()
-              .then((coordinates) => {generatePolylineFromPoints(coordinates)})
+    getLocationUpdates().then((_) {
+      getPolylinePoints()
+          .then((coordinates) => generateCirclesFromPoints(coordinates));
+      getLocationUpdates().then((_) => {
+            getPolylinePoints().then(
+                (coordinates) => {generatePolylineFromPoints(coordinates)})
+          });
+    });
+
+    // Initialize the timer to update the polyline periodically
+    _timer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
+      if (currentP != null) {
+        setState(() {
+          _polylineCoordinates.add(currentP!);
+          generateCirclesFromPoints(_polylineCoordinates);
         });
+      }
+    });
   }
 
   @override
@@ -42,37 +61,36 @@ class _MapPageState extends State<MapPage> {
       body: currentP == null
           ? const Center(child: Text('Loading...'))
           : GoogleMap(
-              onMapCreated: ((GoogleMapController controller) =>
-                  _mapController.complete(controller)),
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
+              },
               initialCameraPosition:
-                  CameraPosition(target: currentP!, zoom: 15),
+                  CameraPosition(target: currentP!, zoom: currentZoom),
               markers: {
                 Marker(
                   markerId: const MarkerId('currentLocation'),
                   icon: BitmapDescriptor.defaultMarker,
                   position: currentP!,
                 ),
-                // const Marker(
-                //   markerId: MarkerId('sourceLocation'),
-                //   icon: BitmapDescriptor.defaultMarker,
-                //   position: _pGooglePxl,
-                // ),
                 const Marker(
-                    markerId: MarkerId('destinationLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: _destination),
+                  markerId: MarkerId('destinationLocation'),
+                  icon: BitmapDescriptor.defaultMarker,
+                  position: _destination,
+                ),
               },
+              circles: circles,
               polylines: Set<Polyline>.of(polylines.values),
-              // onCameraMove: (position) {
-              //   print("camera moved: ${position}");
-              // },
+              onCameraMove: (CameraPosition position) {
+                currentZoom = position.zoom;
+              },
             ),
     );
   }
 
   Future<void> _cameraToPosition(LatLng pos) async {
     final GoogleMapController controller = await _mapController.future;
-    CameraPosition _newCameraPosition = CameraPosition(target: pos, zoom: 13);
+    CameraPosition _newCameraPosition =
+        CameraPosition(target: pos, zoom: currentZoom);
     await controller
         .animateCamera(CameraUpdate.newCameraPosition(_newCameraPosition));
   }
@@ -88,11 +106,9 @@ class _MapPageState extends State<MapPage> {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await _locationController.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
-        // return;
+        return;
       }
     }
-    // _locationController.enableBackgroundMode(enable: true);
-    // print(await _locationController.getLocation());
     _locationController.onLocationChanged
         .listen((LocationData currentLocation) {
       if (currentLocation.longitude != null &&
@@ -101,7 +117,7 @@ class _MapPageState extends State<MapPage> {
           currentP =
               LatLng(currentLocation.latitude!, currentLocation.longitude!);
           _cameraToPosition(currentP!);
-          print("current position : $currentP");
+          // print("current position : $currentP");
         });
       }
     });
@@ -111,12 +127,13 @@ class _MapPageState extends State<MapPage> {
     List<LatLng> polylineCoordinate = [];
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        request: PolylineRequest(
-            origin: PointLatLng(_pGooglePxl.latitude, _pGooglePxl.longitude),
-            destination:
-                PointLatLng(_destination.latitude, _destination.longitude),
-            mode: TravelMode.driving),
-        googleApiKey: GOOGLE_API_KEY);
+      request: PolylineRequest(
+        origin: PointLatLng(_pGooglePxl.latitude, _pGooglePxl.longitude),
+        destination: PointLatLng(_destination.latitude, _destination.longitude),
+        mode: TravelMode.driving,
+      ),
+      googleApiKey: GOOGLE_API_KEY,
+    );
     if (result.points.isNotEmpty) {
       for (var point in result.points) {
         polylineCoordinate.add(LatLng(point.latitude, point.longitude));
@@ -137,5 +154,28 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       polylines[id] = polyLine;
     });
+  }
+
+  void generateCirclesFromPoints(List<LatLng> polylineCoordinates) async {
+    Set<Circle> newCircles = {};
+    for (int i = 0; i < polylineCoordinates.length; i++) {
+      newCircles.add(Circle(
+        circleId: CircleId('circle_$i'),
+        center: polylineCoordinates[i],
+        radius: 3, // Radius in meters
+        fillColor: Colors.red,
+        strokeColor: Colors.black,
+        strokeWidth: 1,
+      ));
+    }
+    setState(() {
+      circles = newCircles;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 }

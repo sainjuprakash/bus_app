@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,15 +35,51 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: ListView.builder(
-        itemCount: 10,
+        itemCount: 6,
         itemBuilder: (context, index) {
-          return const Card(
+          return Card(
             elevation: 3,
             child: Column(
               children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Route 1'),
+                const SizedBox(
+                  height: 80,
+                  width: double.maxFinite,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Bus no.'),
+                      ),
+                      Row(
+                        children: [],
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                      color: const Color(0xFFbfc9c9),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Row(
+                          children: [Icon(Icons.bus_alert), Text('15 stops')],
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.social_distance_rounded),
+                            Text('20 km')
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

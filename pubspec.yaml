@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   google_maps_flutter: ^2.7.0
   location: ^7.0.0
+  shared_preferences: ^2.3.1
+  flutter_localization: ^0.2.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -92,3 +94,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_intl:
+  enabled: true
+  class_name: AppLocalizations
+  main_locale: en
+  arb_dir: lib/app_localization/arb
+  output_dir: lib/app_localization/generated
