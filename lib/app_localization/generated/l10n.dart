@@ -59,6 +59,76 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Bus No.`
+  String get busNo {
+    return Intl.message(
+      'Bus No.',
+      name: 'busNo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Log-In`
+  String get login {
+    return Intl.message(
+      'Log-In',
+      name: 'login',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email`
+  String get email {
+    return Intl.message(
+      'Email',
+      name: 'email',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter email`
+  String get enterEmail {
+    return Intl.message(
+      'Please enter email',
+      name: 'enterEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter valid email`
+  String get enterValidEmail {
+    return Intl.message(
+      'Please enter valid email',
+      name: 'enterValidEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Password`
+  String get password {
+    return Intl.message(
+      'Password',
+      name: 'password',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter valid password`
+  String get enterPassword {
+    return Intl.message(
+      'Please enter valid password',
+      name: 'enterPassword',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1,6 +1,9 @@
-import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
-import 'package:bus_app/nav_page.dart';
+import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
+import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
+import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app_localization/generated/l10n.dart';
 
@@ -8,24 +11,56 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _MyAppState? state = context.findRootAncestorStateOfType<_MyAppState>();
+    state?.setLocale(newLocale);
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale? _locale;
+
+  setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.delegate.supportedLocales,
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return RepositoryProvider(
+      create: (context) => ImplLoginRepository(),
+      child: BlocProvider(
+        create: (context) => LoginBloc(
+          loginRepository: RepositoryProvider.of<ImplLoginRepository>(context),
+        ),
+        child: MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ne', ''),
+            Locale('en', ''),
+          ],
+          locale: _locale,
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          home: const LoginPage(),
+        ),
       ),
-      home: const NavPage(),
     );
   }
 }

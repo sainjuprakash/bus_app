@@ -1,3 +1,4 @@
+import 'package:bus_app/main.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showLanguageSelectionDialog(
@@ -21,6 +22,7 @@ Future<String?> showLanguageSelectionDialog(
                         ? const Icon(Icons.check, color: Colors.green)
                         : null,
                     onTap: () {
+                      MyApp.setLocale(context, const Locale('en'));
                       setState(() {
                         selectedLanguage =
                             'English'; // Update selected language
@@ -33,6 +35,7 @@ Future<String?> showLanguageSelectionDialog(
                         ? const Icon(Icons.check, color: Colors.green)
                         : null,
                     onTap: () {
+                      MyApp.setLocale(context, const Locale('ne'));
                       setState(() {
                         selectedLanguage = 'Nepali'; // Update selected language
                       });

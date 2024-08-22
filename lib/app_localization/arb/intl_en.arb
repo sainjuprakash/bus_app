@@ -1,4 +1,11 @@
 {
 "@@locale": "en",
-"busApp": "Bus App"
+"busApp": "Bus App",
+"busNo" : "Bus No.",
+"login" : "Log-In",
+"email" : "Email",
+"enterEmail" : "Please enter email",
+"enterValidEmail" : "Please enter valid email",
+"password" : "Password",
+"enterPassword" : "Please enter valid password"
 }

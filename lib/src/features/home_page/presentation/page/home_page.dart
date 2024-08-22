@@ -1,3 +1,4 @@
+import 'package:bus_app/app_localization/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey.withOpacity(0.6),
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text(l10n.busApp),
         backgroundColor: Colors.white,
         actions: [
           Padding(
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
             elevation: 3,
             child: Column(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 80,
                   width: double.maxFinite,
                   child: Column(
@@ -49,9 +50,9 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Bus no.'),
+                        child: Text(l10n.busNo),
                       ),
-                      Row(
+                      const Row(
                         children: [],
                       )
                     ],

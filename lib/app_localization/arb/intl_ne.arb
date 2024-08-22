@@ -1,4 +1,12 @@
 {
 "@@locale": "ne",
-"busApp": "बस एप"
+"busApp": "बस एप",
+"busNo" : "बस नम्बर",
+"login" : "लग-इन",
+"email" : "इमेल",
+"enterEmail" : "कृपया इमेल राख्नुहोस्",
+"enterValidEmail" : "कृपया मान्य इमेल राख्नुहोस्",
+"password" : "पासवर्ड",
+"enterPassword" : "कृपया पासवर्ड राख्नुहोस्",
+"enterValidPassword" : "कृपया मान्य पासवर्ड राख्नुहोस्"
 }

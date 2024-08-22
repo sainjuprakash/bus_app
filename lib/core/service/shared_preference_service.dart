@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsServiceKeys {
   static const String isEnglishSelected = '';
+  static const String accessTokem = 'accessTokem';
+
 }
 
 class PrefsService {
