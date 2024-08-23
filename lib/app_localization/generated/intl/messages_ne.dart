@@ -22,6 +22,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "appLanguage": MessageLookupByLibrary.simpleMessage("भाषा"),
         "busApp": MessageLookupByLibrary.simpleMessage("बस एप"),
         "busNo": MessageLookupByLibrary.simpleMessage("बस नम्बर"),
         "email": MessageLookupByLibrary.simpleMessage("इमेल"),
@@ -31,7 +32,16 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("कृपया पासवर्ड राख्नुहोस्"),
         "enterValidEmail":
             MessageLookupByLibrary.simpleMessage("कृपया मान्य इमेल राख्नुहोस्"),
+        "fontSize": MessageLookupByLibrary.simpleMessage("फोन्त साइज"),
+        "logOut": MessageLookupByLibrary.simpleMessage("लग-आउट"),
         "login": MessageLookupByLibrary.simpleMessage("लग-इन"),
-        "password": MessageLookupByLibrary.simpleMessage("पासवर्ड")
+        "password": MessageLookupByLibrary.simpleMessage("पासवर्ड"),
+        "server": MessageLookupByLibrary.simpleMessage("सर्भर"),
+        "setAdminPassword": MessageLookupByLibrary.simpleMessage(
+            "प्रशासक पासवर्ड सेट गर्नुहोस्"),
+        "theme": MessageLookupByLibrary.simpleMessage("थेम"),
+        "userInterface":
+            MessageLookupByLibrary.simpleMessage("प्रयोगकर्ता इन्टरफेस"),
+        "userName": MessageLookupByLibrary.simpleMessage("प्रयोगकर्ता नाम")
       };
 }

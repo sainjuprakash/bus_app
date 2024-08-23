@@ -1,3 +1,4 @@
+import 'package:bus_app/app_localization/l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +42,7 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
-        title: const Text('User Interface'),
+        title:  Text(l10n.userInterface),
         backgroundColor: Colors.white,
       ),
       body: Padding(
@@ -67,9 +68,9 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Language",
-                        style: TextStyle(
+                       Text(
+                      l10n.appLanguage  ,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -86,15 +87,15 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Padding(
-                padding: EdgeInsets.only(left: 18.0),
+              child:  Padding(
+                padding: const EdgeInsets.only(left: 18.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Theme",
-                        style: TextStyle(
+                    Text(l10n.theme,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text('Bright'),
+                    const Text('Bright'),
                   ],
                 ),
               ),
@@ -105,15 +106,15 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: const Padding(
+              child:  Padding(
                 padding: EdgeInsets.only(left: 18.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Font Size",
-                        style: TextStyle(
+                    Text(l10n.fontSize,
+                        style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text('Medium'),
+                    const Text('Medium'),
                   ],
                 ),
               ),

@@ -11,10 +11,6 @@ import '../bloc/login_bloc.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  // String baseUrl, endPoint, villageName, householdUrl;
-  // LoginPage(this.baseUrl, this.endPoint, this.villageName, this.householdUrl,
-  //     {super.key});
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }

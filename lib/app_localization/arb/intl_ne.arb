@@ -8,5 +8,13 @@
 "enterValidEmail" : "कृपया मान्य इमेल राख्नुहोस्",
 "password" : "पासवर्ड",
 "enterPassword" : "कृपया पासवर्ड राख्नुहोस्",
-"enterValidPassword" : "कृपया मान्य पासवर्ड राख्नुहोस्"
+"enterValidPassword" : "कृपया मान्य पासवर्ड राख्नुहोस्",
+"server" : "सर्भर",
+"userName" : "प्रयोगकर्ता नाम",
+"userInterface" : "प्रयोगकर्ता इन्टरफेस",
+"appLanguage" : "भाषा",
+"theme" : "थेम",
+"fontSize" : "फोन्त साइज",
+"setAdminPassword" : "प्रशासक पासवर्ड सेट गर्नुहोस्",
+"logOut" : "लग-आउट"
 }

@@ -1,4 +1,5 @@
 import 'package:bus_app/main.dart';
+import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showLanguageSelectionDialog(
@@ -17,12 +18,14 @@ Future<String?> showLanguageSelectionDialog(
               child: ListBody(
                 children: <Widget>[
                   ListTile(
+                    leading: const Text("🇺🇸"),
                     title: const Text('English'),
                     trailing: selectedLanguage == 'English'
                         ? const Icon(Icons.check, color: Colors.green)
                         : null,
-                    onTap: () {
-                      MyApp.setLocale(context, const Locale('en'));
+                    onTap: () async {
+                      Locale _locale = await setLocale('en');
+                      MyApp.setLocale(context, _locale);
                       setState(() {
                         selectedLanguage =
                             'English'; // Update selected language
@@ -30,12 +33,14 @@ Future<String?> showLanguageSelectionDialog(
                     },
                   ),
                   ListTile(
+                    leading: const Text("🇳🇵"),
                     title: const Text('Nepali'),
                     trailing: selectedLanguage == 'Nepali'
                         ? const Icon(Icons.check, color: Colors.green)
                         : null,
-                    onTap: () {
-                      MyApp.setLocale(context, const Locale('ne'));
+                    onTap: () async {
+                      Locale _locale = await setLocale('ne');
+                      MyApp.setLocale(context, _locale);
                       setState(() {
                         selectedLanguage = 'Nepali'; // Update selected language
                       });

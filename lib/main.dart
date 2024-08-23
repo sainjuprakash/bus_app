@@ -1,11 +1,14 @@
+import 'package:bus_app/nav_page.dart';
 import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
+import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app_localization/generated/l10n.dart';
+import 'core/service/shared_preference_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,12 +27,37 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool isUserLoggedIn = false;
   Locale? _locale;
 
   setLocale(Locale locale) {
     setState(() {
       _locale = locale;
     });
+  }
+
+  @override
+  Future<void> didChangeDependencies() async {
+    Locale local = await getLocale();
+    setLocale(local);
+    super.didChangeDependencies();
+  }
+
+  checkUser() async {
+    final prefs = await PrefsService.getInstance();
+    final aToken = prefs.getString(PrefsServiceKeys.accessTokem);
+
+    setState(() {
+      if (aToken != null) {
+        isUserLoggedIn = aToken.isEmpty ? false : true;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkUser();
   }
 
   @override
@@ -58,7 +86,7 @@ class _MyAppState extends State<MyApp> {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const LoginPage(),
+          home: !isUserLoggedIn ? const LoginPage() : const NavPage(),
         ),
       ),
     );

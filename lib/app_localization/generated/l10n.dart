@@ -129,6 +129,86 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Server`
+  String get server {
+    return Intl.message(
+      'Server',
+      name: 'server',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Username`
+  String get userName {
+    return Intl.message(
+      'Username',
+      name: 'userName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User Interface`
+  String get userInterface {
+    return Intl.message(
+      'User Interface',
+      name: 'userInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App Language`
+  String get appLanguage {
+    return Intl.message(
+      'App Language',
+      name: 'appLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme`
+  String get theme {
+    return Intl.message(
+      'Theme',
+      name: 'theme',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Font Size`
+  String get fontSize {
+    return Intl.message(
+      'Font Size',
+      name: 'fontSize',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set Admin Password`
+  String get setAdminPassword {
+    return Intl.message(
+      'Set Admin Password',
+      name: 'setAdminPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Log-Out`
+  String get logOut {
+    return Intl.message(
+      'Log-Out',
+      name: 'logOut',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

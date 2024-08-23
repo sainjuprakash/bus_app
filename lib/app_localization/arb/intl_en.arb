@@ -7,5 +7,13 @@
 "enterEmail" : "Please enter email",
 "enterValidEmail" : "Please enter valid email",
 "password" : "Password",
-"enterPassword" : "Please enter valid password"
+"enterPassword" : "Please enter valid password",
+"server" : "Server",
+"userName" : "Username",
+"userInterface" : "User Interface",
+"appLanguage" : "App Language",
+"theme" : "Theme",
+"fontSize" : "Font Size",
+"setAdminPassword" : "Set Admin Password",
+"logOut" : "Log-Out"
 }
