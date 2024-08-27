@@ -3,14 +3,24 @@ import 'package:bus_app/src/features/login_page/data/repository/login_repository
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
+import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'app_localization/generated/l10n.dart';
 import 'core/service/shared_preference_service.dart';
 
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    return Future.value(true);
+  });
+}
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(callbackDispatcher);
   runApp(const MyApp());
 }
 

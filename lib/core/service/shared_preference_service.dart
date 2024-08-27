@@ -4,7 +4,6 @@ class PrefsServiceKeys {
   static const String isEnglishSelected = '';
   static const String accessTokem = 'accessTokem';
   static const String languageCode = 'en';
-
 }
 
 class PrefsService {

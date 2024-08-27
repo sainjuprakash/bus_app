@@ -1,5 +1,7 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:bus_app/core/service/shared_preference_service.dart';
+import 'package:http/http.dart' as http;
 import 'package:bus_app/src/constant/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -25,8 +27,8 @@ class _MapPageState extends State<MapPage> {
   List<LatLng> _polylineCoordinates = [];
   Set<Circle> circles = {};
   Map<PolylineId, Polyline> polylines = {};
-
   Timer? _timer;
+  int _selectedTime = 10;
 
   @override
   void initState() {
@@ -41,14 +43,146 @@ class _MapPageState extends State<MapPage> {
     });
 
     // Initialize the timer to update the polyline periodically
-    _timer = Timer.periodic(const Duration(seconds: 5), (Timer t) {
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel(); // Cancel the existing timer if any
+    _timer = Timer.periodic(Duration(seconds: _selectedTime), (Timer t) {
       if (currentP != null) {
         setState(() {
           _polylineCoordinates.add(currentP!);
           generateCirclesFromPoints(_polylineCoordinates);
         });
+        _sendLocationToServer(currentP!);
       }
     });
+  }
+
+  Future<void> _sendLocationToServer(LatLng position) async {
+    final _prefs = await PrefsService.getInstance();
+    String? bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
+    const String url =
+        'https://gps.git.com.np/api/v1/location-update'; // Replace with your actual endpoint
+
+    DateTime now = DateTime.now();
+    String formattedTime =
+        "${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')} "
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $bearerToken',
+        },
+        body: jsonEncode({
+          'bus_id': 1,
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'time': formattedTime,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Handle successful response
+        print('Location sent successfully');
+      } else {
+        // Handle error response
+        print('Failed to send location: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending location: $e');
+    }
+  }
+
+  void _showTimerDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Input Method'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile<int>(
+                title: const Text('1 seconds'),
+                value: 1,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<int>(
+                title: const Text('5 seconds'),
+                value: 5,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<int>(
+                title: const Text('10 seconds'),
+                value: 10,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<int>(
+                title: const Text('20 seconds'),
+                value: 20,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<int>(
+                title: const Text('30 seconds'),
+                value: 30,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              RadioListTile<int>(
+                title: const Text('1 minutes'),
+                value: 60,
+                groupValue: _selectedTime,
+                onChanged: (int? value) {
+                  setState(() {
+                    _selectedTime = value!;
+                    _startTimer();
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -60,30 +194,40 @@ class _MapPageState extends State<MapPage> {
       ),
       body: currentP == null
           ? const Center(child: Text('Loading...'))
-          : GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _mapController.complete(controller);
-              },
-              initialCameraPosition:
-                  CameraPosition(target: currentP!, zoom: currentZoom),
-              markers: {
-                Marker(
-                  markerId: const MarkerId('currentLocation'),
-                  icon: BitmapDescriptor.defaultMarker,
-                  position: currentP!,
+          : Stack(children: [
+              GoogleMap(
+                onMapCreated: (GoogleMapController controller) {
+                  _mapController.complete(controller);
+                },
+                initialCameraPosition:
+                    CameraPosition(target: currentP!, zoom: currentZoom),
+                markers: {
+                  Marker(
+                    markerId: const MarkerId('currentLocation'),
+                    icon: BitmapDescriptor.defaultMarker,
+                    position: currentP!,
+                  ),
+                  const Marker(
+                    markerId: MarkerId('destinationLocation'),
+                    icon: BitmapDescriptor.defaultMarker,
+                    position: _destination,
+                  ),
+                },
+                circles: circles,
+                polylines: Set<Polyline>.of(polylines.values),
+                onCameraMove: (CameraPosition position) {
+                  currentZoom = position.zoom;
+                },
+              ),
+              Align(
+                alignment: const Alignment(0.9, 0.6),
+                child: FloatingActionButton(
+                  onPressed: _showTimerDialog,
+                  tooltip: 'Timer Adjustment',
+                  child: const Icon(Icons.add_location_alt_outlined),
                 ),
-                const Marker(
-                  markerId: MarkerId('destinationLocation'),
-                  icon: BitmapDescriptor.defaultMarker,
-                  position: _destination,
-                ),
-              },
-              circles: circles,
-              polylines: Set<Polyline>.of(polylines.values),
-              onCameraMove: (CameraPosition position) {
-                currentZoom = position.zoom;
-              },
-            ),
+              )
+            ]),
     );
   }
 
