@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:workmanager/workmanager.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -28,11 +29,17 @@ class _MapPageState extends State<MapPage> {
   Set<Circle> circles = {};
   Map<PolylineId, Polyline> polylines = {};
   Timer? _timer;
+  String? bearerToken;
+  int? busId;
   int _selectedTime = 10;
+  int selectedNumber = 10;
+  final int minNumber = 5;
+  final int maxNumber = 120; // You can adjust this as neede
 
   @override
   void initState() {
     super.initState();
+    getDataFromSharedPrefs();
     getLocationUpdates().then((_) {
       getPolylinePoints()
           .then((coordinates) => generateCirclesFromPoints(coordinates));
@@ -48,20 +55,36 @@ class _MapPageState extends State<MapPage> {
 
   void _startTimer() {
     _timer?.cancel(); // Cancel the existing timer if any
-    _timer = Timer.periodic(Duration(seconds: _selectedTime), (Timer t) {
+    _timer = Timer.periodic(Duration(seconds: selectedNumber), (Timer t) {
       if (currentP != null) {
         setState(() {
           _polylineCoordinates.add(currentP!);
           generateCirclesFromPoints(_polylineCoordinates);
         });
         _sendLocationToServer(currentP!);
+
+        Workmanager().registerOneOffTask(
+          'location_task',
+          'send_location_task',
+          initialDelay: Duration(seconds: 1),
+          inputData: {
+            'latitude': currentP!.latitude,
+            'longitude': currentP!.longitude,
+          },
+        );
       }
     });
   }
 
-  Future<void> _sendLocationToServer(LatLng position) async {
+  Future<void> getDataFromSharedPrefs() async {
     final _prefs = await PrefsService.getInstance();
-    String? bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
+    bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
+    busId = _prefs.getInt(PrefsServiceKeys.busId);
+    print('-----------------------------------');
+    print(busId.runtimeType);
+  }
+
+  Future<void> _sendLocationToServer(LatLng position) async {
     const String url =
         'https://gps.git.com.np/api/v1/location-update'; // Replace with your actual endpoint
 
@@ -78,7 +101,7 @@ class _MapPageState extends State<MapPage> {
           'Authorization': 'Bearer $bearerToken',
         },
         body: jsonEncode({
-          'bus_id': 1,
+          'bus_id': busId,
           'latitude': position.latitude,
           'longitude': position.longitude,
           'time': formattedTime,
@@ -97,7 +120,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void _showTimerDialog() {
+  /*void _showTimerDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -183,15 +206,15 @@ class _MapPageState extends State<MapPage> {
         );
       },
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Maps'),
-        backgroundColor: Colors.white,
-      ),
+      // appBar: AppBar(
+      //   title: const Text('My Maps'),
+      //   backgroundColor: Colors.white,
+      // ),
       body: currentP == null
           ? const Center(child: Text('Loading...'))
           : Stack(children: [
@@ -220,13 +243,57 @@ class _MapPageState extends State<MapPage> {
                 },
               ),
               Align(
-                alignment: const Alignment(0.9, 0.6),
-                child: FloatingActionButton(
-                  onPressed: _showTimerDialog,
-                  tooltip: 'Timer Adjustment',
-                  child: const Icon(Icons.add_location_alt_outlined),
+                alignment: const Alignment(0, -0.91),
+                child: Container(
+                  height: 50,
+                  width: double.maxFinite,
+                  color: Colors.grey.withOpacity(0.6),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: (maxNumber - minNumber) ~/ 5 + 1,
+                    itemBuilder: (context, index) {
+                      int number = minNumber + index * 5;
+                      bool isSelected = number == selectedNumber;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedNumber = number;
+                            _startTimer();
+                          });
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: 60,
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected ? Colors.blue : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "${number.toString()}s",
+                            style: TextStyle(
+                              fontSize: isSelected ? 24 : 18,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isSelected ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              )
+              ),
+              // Align(
+              //   alignment: const Alignment(0.9, 0.6),
+              //   child: FloatingActionButton(
+              //     onPressed: _showTimerDialog,
+              //     tooltip: 'Timer Adjustment',
+              //     child: const Icon(Icons.add_location_alt_outlined),
+              //   ),
+              // )
             ]),
     );
   }

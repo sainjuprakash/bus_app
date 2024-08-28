@@ -3,7 +3,6 @@ import 'package:bus_app/src/features/login_page/data/repository/login_repository
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
-import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -19,8 +18,8 @@ void callbackDispatcher() {
 }
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(callbackDispatcher);
+ WidgetsFlutterBinding.ensureInitialized();
+ Workmanager().initialize(callbackDispatcher);
   runApp(const MyApp());
 }
 
