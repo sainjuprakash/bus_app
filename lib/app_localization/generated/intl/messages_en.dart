@@ -24,7 +24,10 @@ class MessageLookup extends MessageLookupByLibrary {
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "appLanguage": MessageLookupByLibrary.simpleMessage("App Language"),
         "busApp": MessageLookupByLibrary.simpleMessage("Bus App"),
+        "busId": MessageLookupByLibrary.simpleMessage("Bus ID"),
         "busNo": MessageLookupByLibrary.simpleMessage("Bus No."),
+        "driverEmail": MessageLookupByLibrary.simpleMessage("Driver Email"),
+        "driverName": MessageLookupByLibrary.simpleMessage("Driver Name"),
         "email": MessageLookupByLibrary.simpleMessage("Email"),
         "enterEmail":
             MessageLookupByLibrary.simpleMessage("Please enter email"),
@@ -35,6 +38,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "fontSize": MessageLookupByLibrary.simpleMessage("Font Size"),
         "logOut": MessageLookupByLibrary.simpleMessage("Log-Out"),
         "login": MessageLookupByLibrary.simpleMessage("Log-In"),
+        "myInformation": MessageLookupByLibrary.simpleMessage("My Information"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
         "server": MessageLookupByLibrary.simpleMessage("Server"),
         "setAdminPassword":

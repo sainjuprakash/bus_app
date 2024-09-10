@@ -51,6 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: SizedBox(
@@ -203,10 +204,10 @@ class _LoginPageState extends State<LoginPage> {
                                                   },
                                                   style: TextButton.styleFrom(
                                                       elevation: 3.0,
-                                                      backgroundColor:
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .primary,
+                                                      // backgroundColor:
+                                                      //     Theme.of(context)
+                                                      //         .colorScheme
+                                                      //           .primary,
                                                       foregroundColor:
                                                           Colors.white,
                                                       shape:
@@ -225,7 +226,6 @@ class _LoginPageState extends State<LoginPage> {
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: const TextStyle(
-                                                          color: Colors.white,
                                                           fontSize: 16,
                                                           fontWeight:
                                                               FontWeight.w600),

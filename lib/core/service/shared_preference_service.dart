@@ -5,6 +5,8 @@ class PrefsServiceKeys {
   static const String accessTokem = 'accessTokem';
   static const String languageCode = 'en';
   static const String busId = 'busID';
+  static const String driverEmail = 'driverEmail';
+  static const String driverName = 'driverName';
 }
 
 class PrefsService {

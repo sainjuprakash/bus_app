@@ -15,5 +15,9 @@
 "theme" : "Theme",
 "fontSize" : "Font Size",
 "setAdminPassword" : "Set Admin Password",
-"logOut" : "Log-Out"
+"logOut" : "Log-Out",
+"myInformation" : "My Information",
+"driverName" : "Driver Name",
+"driverEmail" : "Driver Email",
+"busId" : "Bus ID"
 }

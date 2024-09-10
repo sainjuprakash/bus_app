@@ -40,6 +40,7 @@ class MyTextField extends StatelessWidget {
       textInputAction: TextInputAction.next,
       onChanged: onChanged,
       decoration: InputDecoration(
+
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         enabledBorder: OutlineInputBorder(
@@ -51,7 +52,7 @@ class MyTextField extends StatelessWidget {
           borderSide:
           BorderSide(color: Theme.of(context).colorScheme.secondary),
         ),
-        fillColor: Colors.grey.shade300,
+        fillColor: Theme.of(context).colorScheme.onPrimary,
         filled: true,
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey[500]),

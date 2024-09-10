@@ -209,6 +209,46 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `My Information`
+  String get myInformation {
+    return Intl.message(
+      'My Information',
+      name: 'myInformation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Driver Name`
+  String get driverName {
+    return Intl.message(
+      'Driver Name',
+      name: 'driverName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Driver Email`
+  String get driverEmail {
+    return Intl.message(
+      'Driver Email',
+      name: 'driverEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bus ID`
+  String get busId {
+    return Intl.message(
+      'Bus ID',
+      name: 'busId',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

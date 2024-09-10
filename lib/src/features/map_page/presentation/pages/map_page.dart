@@ -9,6 +9,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../data/source/map_state_class.dart';
+
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -41,12 +43,20 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     getDataFromSharedPrefs();
     getLocationUpdates().then((_) {
-      getPolylinePoints()
-          .then((coordinates) => generateCirclesFromPoints(coordinates));
-      getLocationUpdates().then((_) => {
-            getPolylinePoints().then(
-                (coordinates) => {generatePolylineFromPoints(coordinates)})
-          });
+      if (mapState.polylineCoordinates.isEmpty) {
+        getPolylinePoints().then((coordinates) {
+          mapState.polylineCoordinates = coordinates;
+          generateCirclesFromPoints(coordinates);
+          generatePolylineFromPoints(coordinates);
+        });
+      } else {
+        setState(() {
+          // Reassigning stored data to the widget's state
+          _polylineCoordinates = mapState.polylineCoordinates;
+          circles = mapState.circles;
+          polylines = mapState.polylines;
+        });
+      }
     });
 
     // Initialize the timer to update the polyline periodically
@@ -80,8 +90,6 @@ class _MapPageState extends State<MapPage> {
     final _prefs = await PrefsService.getInstance();
     bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
     busId = _prefs.getInt(PrefsServiceKeys.busId);
-    print('-----------------------------------');
-    print(busId.runtimeType);
   }
 
   Future<void> _sendLocationToServer(LatLng position) async {
@@ -383,6 +391,7 @@ class _MapPageState extends State<MapPage> {
       circles = newCircles;
     });
   }
+
 
   @override
   void dispose() {

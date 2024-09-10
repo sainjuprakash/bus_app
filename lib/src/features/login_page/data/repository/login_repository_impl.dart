@@ -18,10 +18,12 @@ class ImplLoginRepository extends LoginRepository {
         final accessToken = response.data['data']['token'];
         final prefs = await PrefsService.getInstance();
         await prefs.setString(PrefsServiceKeys.accessTokem, accessToken);
-        print('BUS ID : ${response.data['data']['bus_id']}');
         await prefs.setInt(
             PrefsServiceKeys.busId, response.data['data']['bus_id']);
-
+        await prefs.setString(
+            PrefsServiceKeys.driverEmail, response.data['data']['email']);
+        await prefs.setString(
+            PrefsServiceKeys.driverName, response.data['data']['name']);
         Endpoints.api_token = accessToken;
         // Endpoints.refreshToken = refreshToken;
       } else {

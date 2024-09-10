@@ -1,3 +1,4 @@
+import 'package:bus_app/core/theme/theme.dart';
 import 'package:bus_app/nav_page.dart';
 import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
@@ -18,8 +19,8 @@ void callbackDispatcher() {
 }
 
 void main() {
- WidgetsFlutterBinding.ensureInitialized();
- Workmanager().initialize(callbackDispatcher);
+  WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(callbackDispatcher);
   runApp(const MyApp());
 }
 
@@ -78,6 +79,8 @@ class _MyAppState extends State<MyApp> {
           loginRepository: RepositoryProvider.of<ImplLoginRepository>(context),
         ),
         child: MaterialApp(
+          theme: lightMode,
+          //darkTheme: darkModel,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -91,10 +94,6 @@ class _MyAppState extends State<MyApp> {
           locale: _locale,
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
           home: !isUserLoggedIn ? const LoginPage() : const NavPage(),
         ),
       ),

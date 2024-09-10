@@ -42,8 +42,7 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
-        title:  Text(l10n.userInterface),
-        backgroundColor: Colors.white,
+        title: Text(l10n.userInterface),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 18.0, top: 20),
@@ -68,8 +67,8 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
-                      l10n.appLanguage  ,
+                      Text(
+                        l10n.appLanguage,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -87,7 +86,7 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
               ),
-              child:  Padding(
+              child: Padding(
                 padding: const EdgeInsets.only(left: 18.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +99,7 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
                 ),
               ),
             ),
-            Container(
+            /*   Container(
               height: 70,
               width: double.maxFinite,
               decoration: BoxDecoration(
@@ -118,7 +117,7 @@ class _UserInterfacePageState extends State<UserInterfacePage> {
                   ],
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
       ),

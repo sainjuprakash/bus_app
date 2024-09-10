@@ -14,37 +14,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.withOpacity(0.6),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        title: Text(l10n.busApp),
-        backgroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 18.0),
-            child: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                // color: Colors.red,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Image.asset(
-                'assets/icons/profile.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          )
-        ],
+        title:  Text(l10n.busApp),
+        elevation: 5,
       ),
       body: ListView.builder(
         itemCount: 6,
         itemBuilder: (context, index) {
           return InkWell(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> IndividualBusPage()));
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => IndividualBusPage()));
             },
             child: Card(
               elevation: 3,
+              color: Theme.of(context).colorScheme.primary,
               child: Column(
                 children: [
                   SizedBox(
@@ -67,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                     width: double.maxFinite,
                     decoration: BoxDecoration(
-                        color: const Color(0xFFbfc9c9),
+                        color:Theme.of(context).colorScheme.onPrimary,
                         borderRadius: BorderRadius.circular(8)),
                     child: const Padding(
                       padding: EdgeInsets.all(15.0),
