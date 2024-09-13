@@ -5,7 +5,7 @@ import '../../domain/repository/login_repository.dart';
 
 class ImplLoginRepository extends LoginRepository {
   final DioClient _dioClient = DioClient();
-  get http => null;
+ // get http => null;
 
   @override
   Future<String?> login(String email, String password) async {

@@ -1,5 +1,5 @@
 import 'package:bus_app/app_localization/l10n.dart';
-import 'package:bus_app/src/features/individual_bus/presentation/page/individual_bus_page.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -11,72 +11,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<DateTime> _dates = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title:  Text(l10n.busApp),
+        title: Text(l10n.busApp),
         elevation: 5,
       ),
-      body: ListView.builder(
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => IndividualBusPage()));
-            },
-            child: Card(
-              elevation: 3,
-              color: Theme.of(context).colorScheme.primary,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 80,
-                    width: double.maxFinite,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(l10n.busNo),
-                        ),
-                        const Row(
-                          children: [],
-                        )
-                      ],
-                    ),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Card(
+          elevation: 5,
+          child: CalendarDatePicker2(
+            config: CalendarDatePicker2Config(
+              calendarType: CalendarDatePicker2Type.single,
+              selectedDayHighlightColor:
+                  Colors.blueAccent, // Color for selected day
+              weekdayLabels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+              weekdayLabelTextStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+              dayTextStyle: const TextStyle(
+                  // Color for regular days
                   ),
-                  Container(
-                    height: 50,
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                        color:Theme.of(context).colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
-                            children: [Icon(Icons.bus_alert), Text('15 stops')],
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.social_distance_rounded),
-                              Text('20 km')
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              selectedDayTextStyle: const TextStyle(
+                color: Colors.white, // Color for text in selected day
+                fontWeight: FontWeight.bold,
+              ),
+              todayTextStyle: const TextStyle(
+                color: Colors.redAccent, // Color for today's date
+                fontWeight: FontWeight.bold,
               ),
             ),
-          );
-        },
+            value: _dates,
+            onValueChanged: (dates) {
+              setState(() {
+                _dates = dates;
+                print(_dates);
+              });
+            },
+          ),
+        ),
       ),
     );
   }

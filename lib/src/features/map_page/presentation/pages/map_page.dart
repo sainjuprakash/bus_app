@@ -47,7 +47,7 @@ class _MapPageState extends State<MapPage> {
         getPolylinePoints().then((coordinates) {
           mapState.polylineCoordinates = coordinates;
           generateCirclesFromPoints(coordinates);
-          generatePolylineFromPoints(coordinates);
+          //generatePolylineFromPoints(coordinates);
         });
       } else {
         setState(() {
@@ -76,7 +76,7 @@ class _MapPageState extends State<MapPage> {
         Workmanager().registerOneOffTask(
           'location_task',
           'send_location_task',
-          initialDelay: Duration(seconds: 1),
+          initialDelay: const Duration(seconds: 1),
           inputData: {
             'latitude': currentP!.latitude,
             'longitude': currentP!.longitude,
@@ -219,10 +219,6 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('My Maps'),
-      //   backgroundColor: Colors.white,
-      // ),
       body: currentP == null
           ? const Center(child: Text('Loading...'))
           : Stack(children: [
@@ -238,11 +234,11 @@ class _MapPageState extends State<MapPage> {
                     icon: BitmapDescriptor.defaultMarker,
                     position: currentP!,
                   ),
-                  const Marker(
-                    markerId: MarkerId('destinationLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: _destination,
-                  ),
+                  // const Marker(
+                  //   markerId: MarkerId('destinationLocation'),
+                  //   icon: BitmapDescriptor.defaultMarker,
+                  //   position: _destination,
+                  // ),
                 },
                 circles: circles,
                 polylines: Set<Polyline>.of(polylines.values),
@@ -363,17 +359,17 @@ class _MapPageState extends State<MapPage> {
     return polylineCoordinate;
   }
 
-  void generatePolylineFromPoints(List<LatLng> polylineCoordinates) async {
-    PolylineId id = const PolylineId('poly');
-    Polyline polyLine = Polyline(
-        polylineId: id,
-        color: Colors.red,
-        points: polylineCoordinates,
-        width: 5);
-    setState(() {
-      polylines[id] = polyLine;
-    });
-  }
+  // void generatePolylineFromPoints(List<LatLng> polylineCoordinates) async {
+  //   PolylineId id = const PolylineId('poly');
+  //   Polyline polyLine = Polyline(
+  //       polylineId: id,
+  //       color: Colors.red,
+  //       points: polylineCoordinates,
+  //       width: 5);
+  //   setState(() {
+  //     polylines[id] = polyLine;
+  //   });
+  // }
 
   void generateCirclesFromPoints(List<LatLng> polylineCoordinates) async {
     Set<Circle> newCircles = {};
@@ -391,7 +387,6 @@ class _MapPageState extends State<MapPage> {
       circles = newCircles;
     });
   }
-
 
   @override
   void dispose() {

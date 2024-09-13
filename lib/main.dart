@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
         ),
         child: MaterialApp(
           theme: lightMode,
-          //darkTheme: darkModel,
+          darkTheme: darkMode,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
