@@ -9,7 +9,7 @@ abstract class BusLocationState extends Equatable {
 class BusLocationLoadingState extends BusLocationState {}
 
 class BusLocationSuccessState extends BusLocationState {
-  BusLocationResponse busLocationResponse;
+  List<BusLocationModel> busLocationResponse;
   BusLocationSuccessState(this.busLocationResponse);
 }
 

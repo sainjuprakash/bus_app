@@ -5,11 +5,25 @@ import 'package:bus_app/src/features/home_page/data/model/bus_location_response.
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
+import '../../data/model/bus_location.dart';
+import '../../domain/repository/bus_location_repository.dart';
+
 part 'bus_location_event.dart';
 part 'bus_location_state.dart';
 
 class BusLocationBloc extends Bloc<BusLocationEvent, BusLocationState> {
-  BusLocationBloc() : super(BusLocationLoadingState()) {
-    on<GetBusLocationEvent>((event, emit) async {});
+  BusLocationRepository busLocationRepository;
+  BusLocationBloc(this.busLocationRepository)
+      : super(BusLocationLoadingState()) {
+    on<GetBusLocationEvent>((event, emit) async {
+      try {
+         List<BusLocationModel> fetchedData =
+            await busLocationRepository.getBusLocation();
+        emit(BusLocationSuccessState(fetchedData));
+      } catch (errMsg) {
+        print(errMsg.toString());
+        emit(BusLocationFailureState(errMsg.toString()));
+      }
+    });
   }
 }

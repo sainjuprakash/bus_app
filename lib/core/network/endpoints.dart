@@ -9,7 +9,6 @@
 class Endpoints {
   static String loginBaseUrl = 'https://gps.git.com.np/api/v1';
   static const String login = 'login';
-
   static const String api_key = '';
 
   // will save token here for now

@@ -1,5 +1,6 @@
 import 'package:bus_app/core/theme/theme.dart';
 import 'package:bus_app/nav_page.dart';
+import 'package:bus_app/src/features/home_page/data/repository/bus_location_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
@@ -72,8 +73,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => ImplLoginRepository(),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => ImplLoginRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => BusLocationRepositoryImpl(),
+        ),
+      ],
       child: BlocProvider(
         create: (context) => LoginBloc(
           loginRepository: RepositoryProvider.of<ImplLoginRepository>(context),
