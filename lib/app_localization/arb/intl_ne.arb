@@ -17,8 +17,7 @@
 "fontSize" : "फोन्त साइज",
 "setAdminPassword" : "प्रशासक पासवर्ड सेट गर्नुहोस्",
 "logOut" : "लग-आउट",
-"myInformation" : "व्यक्तिगत जानकारी",
-"driverName" : "चालकको नाम",
-"driverEmail" : "चालक ईमेल",
-"busId" : "बस आईडी"
+"name" : "नाम",
+"email" : "ईमेल",
+"id" : "आईडी"
 }

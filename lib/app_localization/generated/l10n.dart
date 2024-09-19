@@ -220,31 +220,21 @@ class AppLocalizations {
     );
   }
 
-  /// `Driver Name`
-  String get driverName {
+  /// `Name`
+  String get name {
     return Intl.message(
-      'Driver Name',
-      name: 'driverName',
+      'Name',
+      name: 'name',
       desc: '',
       args: [],
     );
   }
 
-  /// `Driver Email`
-  String get driverEmail {
+  /// `ID`
+  String get id {
     return Intl.message(
-      'Driver Email',
-      name: 'driverEmail',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Bus ID`
-  String get busId {
-    return Intl.message(
-      'Bus ID',
-      name: 'busId',
+      'ID',
+      name: 'id',
       desc: '',
       args: [],
     );

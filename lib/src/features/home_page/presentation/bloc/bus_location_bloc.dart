@@ -13,12 +13,13 @@ part 'bus_location_state.dart';
 
 class BusLocationBloc extends Bloc<BusLocationEvent, BusLocationState> {
   BusLocationRepository busLocationRepository;
-  BusLocationBloc(this.busLocationRepository)
+  List<DateTime> todaysDate;
+  BusLocationBloc(this.busLocationRepository, this.todaysDate)
       : super(BusLocationLoadingState()) {
     on<GetBusLocationEvent>((event, emit) async {
       try {
-         List<BusLocationModel> fetchedData =
-            await busLocationRepository.getBusLocation();
+        List<BusLocationModel> fetchedData =
+            await busLocationRepository.getBusLocation(todaysDate);
         emit(BusLocationSuccessState(fetchedData));
       } catch (errMsg) {
         print(errMsg.toString());

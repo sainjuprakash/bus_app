@@ -3,5 +3,5 @@ import 'package:bus_app/src/features/home_page/data/model/bus_location_response.
 import '../../data/model/bus_location.dart';
 
 abstract class BusLocationRepository {
-  Future<List<BusLocationModel>> getBusLocation();
+  Future<List<BusLocationModel>> getBusLocation(List<DateTime> dateTime);
 }

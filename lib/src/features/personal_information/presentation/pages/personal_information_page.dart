@@ -58,7 +58,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                 Row(
                   children: [
                     Text(
-                      '${l10n.busId}   :   ',
+                      '${l10n.id}   :   ',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -72,7 +72,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                 Row(
                   children: [
                     Text(
-                      '${l10n.driverName}   :   ',
+                      '${l10n.name}   :   ',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
@@ -86,7 +86,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
                 Row(
                   children: [
                     Text(
-                      '${l10n.driverEmail}   :   ',
+                      '${l10n.email}   :   ',
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),

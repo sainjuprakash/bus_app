@@ -24,11 +24,8 @@ class MessageLookup extends MessageLookupByLibrary {
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "appLanguage": MessageLookupByLibrary.simpleMessage("भाषा"),
         "busApp": MessageLookupByLibrary.simpleMessage("बस एप"),
-        "busId": MessageLookupByLibrary.simpleMessage("बस आईडी"),
         "busNo": MessageLookupByLibrary.simpleMessage("बस नम्बर"),
-        "driverEmail": MessageLookupByLibrary.simpleMessage("चालक ईमेल"),
-        "driverName": MessageLookupByLibrary.simpleMessage("चालकको नाम"),
-        "email": MessageLookupByLibrary.simpleMessage("इमेल"),
+        "email": MessageLookupByLibrary.simpleMessage("ईमेल"),
         "enterEmail":
             MessageLookupByLibrary.simpleMessage("कृपया इमेल राख्नुहोस्"),
         "enterPassword":
@@ -36,10 +33,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "enterValidEmail":
             MessageLookupByLibrary.simpleMessage("कृपया मान्य इमेल राख्नुहोस्"),
         "fontSize": MessageLookupByLibrary.simpleMessage("फोन्त साइज"),
+        "id": MessageLookupByLibrary.simpleMessage("आईडी"),
         "logOut": MessageLookupByLibrary.simpleMessage("लग-आउट"),
         "login": MessageLookupByLibrary.simpleMessage("लग-इन"),
-        "myInformation":
-            MessageLookupByLibrary.simpleMessage("व्यक्तिगत जानकारी"),
+        "name": MessageLookupByLibrary.simpleMessage("नाम"),
         "password": MessageLookupByLibrary.simpleMessage("पासवर्ड"),
         "server": MessageLookupByLibrary.simpleMessage("सर्भर"),
         "setAdminPassword": MessageLookupByLibrary.simpleMessage(

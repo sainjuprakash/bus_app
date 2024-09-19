@@ -13,10 +13,10 @@ class NavPage extends StatefulWidget {
 class _NavPageState extends State<NavPage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    const HomePage(),
     MapPage(),
-    ProfilePage(),
+    const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {

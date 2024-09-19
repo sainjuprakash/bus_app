@@ -17,7 +17,7 @@
 "setAdminPassword" : "Set Admin Password",
 "logOut" : "Log-Out",
 "myInformation" : "My Information",
-"driverName" : "Driver Name",
-"driverEmail" : "Driver Email",
-"busId" : "Bus ID"
+"name" : "Name",
+"email" : "Email",
+"id" : "ID"
 }

@@ -9,10 +9,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../data/source/map_state_class.dart';
+import '../../../home_page/data/model/bus_location.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+  List<BusLocationModel>? busLocationModel;
+  MapPage({this.busLocationModel, super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -38,29 +39,38 @@ class _MapPageState extends State<MapPage> {
   final int minNumber = 5;
   final int maxNumber = 120; // You can adjust this as neede
 
+  bool _isTracking = false; // To control location tracking
+
   @override
   void initState() {
+    print('------------------------');
+    print(widget.busLocationModel);
     super.initState();
     getDataFromSharedPrefs();
-    getLocationUpdates().then((_) {
-      if (mapState.polylineCoordinates.isEmpty) {
-        getPolylinePoints().then((coordinates) {
-          mapState.polylineCoordinates = coordinates;
-          generateCirclesFromPoints(coordinates);
-          //generatePolylineFromPoints(coordinates);
-        });
-      } else {
-        setState(() {
-          // Reassigning stored data to the widget's state
-          _polylineCoordinates = mapState.polylineCoordinates;
-          circles = mapState.circles;
-          polylines = mapState.polylines;
-        });
-      }
-    });
+    getLocationUpdates(); // We get location updates but don't generate circles until tracking starts
 
-    // Initialize the timer to update the polyline periodically
-    _startTimer();
+    // Get polyline points initially, but don't start the timer until tracking starts
+    // getPolylinePoints().then((coordinates) {
+    //   setState(() {
+    //     _polylineCoordinates = coordinates;
+    //     generateCirclesFromPoints(coordinates);
+    //   });
+    // });
+  }
+
+  // Start tracking location when button is pressed
+  void _startTracking() {
+    if (!_isTracking) {
+      setState(() {
+        _isTracking = true;
+      });
+      _startTimer(); // Start the periodic task
+    } else {
+      setState(() {
+        _isTracking = false;
+      });
+      _timer?.cancel(); // Stop the periodic task
+    }
   }
 
   void _startTimer() {
@@ -117,10 +127,8 @@ class _MapPageState extends State<MapPage> {
       );
 
       if (response.statusCode == 200) {
-        // Handle successful response
         print('Location sent successfully');
       } else {
-        // Handle error response
         print('Failed to send location: ${response.statusCode}');
       }
     } catch (e) {
@@ -128,177 +136,96 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  /*void _showTimerDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Input Method'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RadioListTile<int>(
-                title: const Text('1 seconds'),
-                value: 1,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<int>(
-                title: const Text('5 seconds'),
-                value: 5,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<int>(
-                title: const Text('10 seconds'),
-                value: 10,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<int>(
-                title: const Text('20 seconds'),
-                value: 20,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<int>(
-                title: const Text('30 seconds'),
-                value: 30,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              RadioListTile<int>(
-                title: const Text('1 minutes'),
-                value: 60,
-                groupValue: _selectedTime,
-                onChanged: (int? value) {
-                  setState(() {
-                    _selectedTime = value!;
-                    _startTimer();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }*/
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: currentP == null
           ? const Center(child: Text('Loading...'))
-          : Stack(children: [
-              GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  _mapController.complete(controller);
-                },
-                initialCameraPosition:
-                    CameraPosition(target: currentP!, zoom: currentZoom),
-                markers: {
-                  Marker(
-                    markerId: const MarkerId('currentLocation'),
-                    icon: BitmapDescriptor.defaultMarker,
-                    position: currentP!,
-                  ),
-                  // const Marker(
-                  //   markerId: MarkerId('destinationLocation'),
-                  //   icon: BitmapDescriptor.defaultMarker,
-                  //   position: _destination,
-                  // ),
-                },
-                circles: circles,
-                polylines: Set<Polyline>.of(polylines.values),
-                onCameraMove: (CameraPosition position) {
-                  currentZoom = position.zoom;
-                },
-              ),
-              Align(
-                alignment: const Alignment(0, -0.91),
-                child: Container(
-                  height: 50,
-                  width: double.maxFinite,
-                  color: Colors.grey.withOpacity(0.6),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: (maxNumber - minNumber) ~/ 5 + 1,
-                    itemBuilder: (context, index) {
-                      int number = minNumber + index * 5;
-                      bool isSelected = number == selectedNumber;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedNumber = number;
-                            _startTimer();
-                          });
-                        },
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: 60,
-                          margin: const EdgeInsets.symmetric(horizontal: 10),
-                          decoration: BoxDecoration(
-                            color:
-                                isSelected ? Colors.blue : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            "${number.toString()}s",
-                            style: TextStyle(
-                              fontSize: isSelected ? 24 : 18,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected ? Colors.white : Colors.black,
+          : Stack(
+              children: [
+                GoogleMap(
+                  onMapCreated: (GoogleMapController controller) {
+                    _mapController.complete(controller);
+                  },
+                  initialCameraPosition:
+                      CameraPosition(target: currentP!, zoom: currentZoom),
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId('currentLocation'),
+                      icon: BitmapDescriptor.defaultMarker,
+                      position: currentP!,
+                    ),
+                  },
+                  circles: circles,
+                  polylines: Set<Polyline>.of(polylines.values),
+                  onCameraMove: (CameraPosition position) {
+                    currentZoom = position.zoom;
+                  },
+                ),
+                Align(
+                  alignment: const Alignment(0, -0.91),
+                  child: Container(
+                    height: 50,
+                    width: double.maxFinite,
+                    color: Colors.grey.withOpacity(0.6),
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: (maxNumber - minNumber) ~/ 5 + 1,
+                      itemBuilder: (context, index) {
+                        int number = minNumber + index * 5;
+                        bool isSelected = number == selectedNumber;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedNumber = number;
+                              if (_isTracking) {
+                                _startTimer(); // Restart the timer with new interval
+                              }
+                            });
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: 60,
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              color:
+                                  isSelected ? Colors.blue : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              "${number.toString()}s",
+                              style: TextStyle(
+                                fontSize: isSelected ? 24 : 18,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-              // Align(
-              //   alignment: const Alignment(0.9, 0.6),
-              //   child: FloatingActionButton(
-              //     onPressed: _showTimerDialog,
-              //     tooltip: 'Timer Adjustment',
-              //     child: const Icon(Icons.add_location_alt_outlined),
-              //   ),
-              // )
-            ]),
+                Align(
+                  alignment: const Alignment(0.95, 0.68),
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.blue,
+                    onPressed: _startTracking,
+                    tooltip: _isTracking
+                        ? 'Stop Tracking'
+                        : 'Start Tracking', // Label changes dynamically
+                    child: Icon(
+                      _isTracking
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_filled,
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              ],
+            ),
     );
   }
 
@@ -332,7 +259,6 @@ class _MapPageState extends State<MapPage> {
           currentP =
               LatLng(currentLocation.latitude!, currentLocation.longitude!);
           _cameraToPosition(currentP!);
-          // print("current position : $currentP");
         });
       }
     });
