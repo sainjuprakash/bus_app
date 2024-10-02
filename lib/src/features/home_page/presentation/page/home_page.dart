@@ -1,10 +1,12 @@
 import 'package:bus_app/app_localization/l10n.dart';
+import 'package:bus_app/src/features/bus_location_history/presentation/page/bus_location_history_page.dart';
 import 'package:bus_app/src/features/home_page/data/model/bus_location.dart';
 import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../data/repository/bus_location_repository_impl.dart';
 import '../bloc/bus_location_bloc.dart';
@@ -20,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   final DateTime currentDate = DateTime.now();
   List<DateTime> _dates = [];
   late List<BusLocationModel> busLocationModel;
+  List<LatLng> busCoordinates = [];
 
   @override
   void initState() {
@@ -84,9 +87,20 @@ class _HomePageState extends State<HomePage> {
                                     ));
                                   }
                                   if (state is BusLocationSuccessState) {
-                                    return MapPage(
-                                        busLocationModel:
-                                            state.busLocationResponse);
+                                    busLocationModel =
+                                        state.busLocationResponse;
+                                    busCoordinates.clear();
+                                    for (var location in busLocationModel) {
+                                      double latitude =
+                                          double.parse(location.latitude);
+                                      double longitude =
+                                          double.parse(location.longitude);
+                                      busCoordinates
+                                          .add(LatLng(latitude, longitude));
+                                    }
+                                    return BusLocationHistoryPage(
+                                      locationHistory: busCoordinates,
+                                    );
                                   }
                                   if (state is BusLocationFailureState) {
                                     return const Center(

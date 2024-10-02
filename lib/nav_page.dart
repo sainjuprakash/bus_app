@@ -11,7 +11,7 @@ class NavPage extends StatefulWidget {
 }
 
 class _NavPageState extends State<NavPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),

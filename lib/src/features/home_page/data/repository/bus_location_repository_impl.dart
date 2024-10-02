@@ -11,7 +11,6 @@ class BusLocationRepositoryImpl implements BusLocationRepository {
   @override
   Future<List<BusLocationModel>> getBusLocation(List<DateTime> dateTime) async {
     try {
-      // Format the date to 'YYYY-MM-DD'
       String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime.first);
 
       final response = await _dioClient.post(

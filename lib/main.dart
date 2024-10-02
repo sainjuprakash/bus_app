@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bus_app/core/theme/theme.dart';
 import 'package:bus_app/nav_page.dart';
 import 'package:bus_app/src/features/home_page/data/repository/bus_location_repository_impl.dart';
@@ -6,11 +8,14 @@ import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dar
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'app_localization/generated/l10n.dart';
+import 'core/service/background_service.dart';
 import 'core/service/shared_preference_service.dart';
 
 void callbackDispatcher() {
@@ -19,9 +24,16 @@ void callbackDispatcher() {
   });
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
+  await initializeService();
   Workmanager().initialize(callbackDispatcher);
+
   runApp(const MyApp());
 }
 
