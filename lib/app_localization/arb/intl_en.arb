@@ -19,5 +19,6 @@
 "myInformation" : "My Information",
 "name" : "Name",
 "email" : "Email",
-"id" : "ID"
+"id" : "ID",
+"aboutUs" : "About Us"
 }

@@ -56,6 +56,10 @@ dependencies:
   flutter_background_service_ios: ^5.0.3
   permission_handler: ^11.3.1
   flutter_local_notifications: ^17.2.3
+  maplibre_gl: ^0.20.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  wakelock_plus: ^1.2.10
 
 dev_dependencies:
   flutter_test:

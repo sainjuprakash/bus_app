@@ -33,7 +33,14 @@ void main() async {
   });
   await initializeService();
   Workmanager().initialize(callbackDispatcher);
+  final LifecycleEventHandler lifecycleEventHandler = LifecycleEventHandler(
+    detachedCallBack: () async {
+      final service = FlutterBackgroundService();
+      service.invoke('stopService');
+    },
+  );
 
+  WidgetsBinding.instance.addObserver(lifecycleEventHandler);
   runApp(const MyApp());
 }
 
@@ -118,5 +125,18 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  final Future<void> Function() detachedCallBack;
+
+  LifecycleEventHandler({required this.detachedCallBack});
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      detachedCallBack();
+    }
   }
 }

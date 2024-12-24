@@ -1,19 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:bus_app/core/service/shared_preference_service.dart';
-import 'package:http/http.dart' as http;
 import 'package:bus_app/src/constant/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../../home_page/data/model/bus_location.dart';
+import '../../domain/repository/map_page_repository.dart';
 
 class MapPage extends StatefulWidget {
   List<BusLocationModel>? busLocationModel;
-  MapPage({this.busLocationModel, super.key});
+  final MapRepository mapRepository;
+  MapPage({required this.mapRepository, this.busLocationModel, super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -34,28 +35,20 @@ class _MapPageState extends State<MapPage> {
   Timer? _timer;
   String? bearerToken;
   int? busId;
-  int _selectedTime = 10;
   int selectedNumber = 10;
   final int minNumber = 5;
-  final int maxNumber = 120; // You can adjust this as neede
+  final int maxNumber = 120; // You can adjust this as needed
 
   bool _isTracking = false; // To control location tracking
 
   @override
   void initState() {
-    print('------------------------');
-    print(widget.busLocationModel);
+    // print('------------------------');
+    // print(widget.busLocationModel);
     super.initState();
+    WakelockPlus.enable();
     getDataFromSharedPrefs();
     getLocationUpdates(); // We get location updates but don't generate circles until tracking starts
-
-    // Get polyline points initially, but don't start the timer until tracking starts
-    // getPolylinePoints().then((coordinates) {
-    //   setState(() {
-    //     _polylineCoordinates = coordinates;
-    //     generateCirclesFromPoints(coordinates);
-    //   });
-    // });
   }
 
   // Start tracking location when button is pressed
@@ -81,7 +74,8 @@ class _MapPageState extends State<MapPage> {
           _polylineCoordinates.add(currentP!);
           generateCirclesFromPoints(_polylineCoordinates);
         });
-        _sendLocationToServer(currentP!);
+        widget.mapRepository.sendLocation(
+            position: currentP!, bearerToken: bearerToken!, busId: busId!);
 
         Workmanager().registerOneOffTask(
           'location_task',
@@ -100,40 +94,6 @@ class _MapPageState extends State<MapPage> {
     final _prefs = await PrefsService.getInstance();
     bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
     busId = _prefs.getInt(PrefsServiceKeys.busId);
-  }
-
-  Future<void> _sendLocationToServer(LatLng position) async {
-    const String url =
-        'https://gps.git.com.np/api/v1/location-update'; // Replace with your actual endpoint
-
-    DateTime now = DateTime.now();
-    String formattedTime =
-        "${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')} "
-        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $bearerToken',
-        },
-        body: jsonEncode({
-          'bus_id': busId,
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-          'time': formattedTime,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        print('Location sent successfully');
-      } else {
-        print('Failed to send location: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error sending location: $e');
-    }
   }
 
   @override
@@ -163,7 +123,7 @@ class _MapPageState extends State<MapPage> {
                   },
                 ),
                 Align(
-                  alignment: const Alignment(0, -0.91),
+                  alignment: Alignment(0, -0.9),
                   child: Container(
                     height: 50,
                     width: double.maxFinite,
@@ -208,22 +168,60 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ),
                 ),
-                Align(
-                  alignment: const Alignment(0.95, 0.68),
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.blue,
-                    onPressed: _startTracking,
-                    tooltip: _isTracking
-                        ? 'Stop Tracking'
-                        : 'Start Tracking', // Label changes dynamically
-                    child: Icon(
-                      _isTracking
-                          ? Icons.pause_circle_filled
-                          : Icons.play_circle_filled,
-                      color: Colors.white,
-                    ),
-                  ),
-                )
+                DraggableScrollableSheet(
+                  initialChildSize: 0.05,
+                  minChildSize: 0.05,
+                  maxChildSize: 0.6,
+                  builder: (context, scrollController) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 5,
+                            spreadRadius: 1,
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 8, bottom: 8),
+                            height: 5,
+                            width: MediaQuery.of(context).size.width / 2,
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView(
+                              controller: scrollController,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        _startTracking();
+                                      },
+                                      child: Text(
+                                        _isTracking
+                                            ? 'Stop Tracking'
+                                            : 'Start Tracking',
+                                        style: TextStyle(color: Colors.white),
+                                      )),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
     );
@@ -264,37 +262,25 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  Future<List<LatLng>> getPolylinePoints() async {
-    List<LatLng> polylineCoordinate = [];
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      request: PolylineRequest(
-        origin: PointLatLng(_pGooglePxl.latitude, _pGooglePxl.longitude),
-        destination: PointLatLng(_destination.latitude, _destination.longitude),
-        mode: TravelMode.driving,
-      ),
-      googleApiKey: GOOGLE_API_KEY,
-    );
-    if (result.points.isNotEmpty) {
-      for (var point in result.points) {
-        polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-      }
-    } else {
-      print(result.errorMessage);
-    }
-    return polylineCoordinate;
-  }
-
-  // void generatePolylineFromPoints(List<LatLng> polylineCoordinates) async {
-  //   PolylineId id = const PolylineId('poly');
-  //   Polyline polyLine = Polyline(
-  //       polylineId: id,
-  //       color: Colors.red,
-  //       points: polylineCoordinates,
-  //       width: 5);
-  //   setState(() {
-  //     polylines[id] = polyLine;
-  //   });
+  // Future<List<LatLng>> getPolylinePoints() async {
+  //   List<LatLng> polylineCoordinate = [];
+  //   PolylinePoints polylinePoints = PolylinePoints();
+  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+  //     request: PolylineRequest(
+  //       origin: PointLatLng(_pGooglePxl.latitude, _pGooglePxl.longitude),
+  //       destination: PointLatLng(_destination.latitude, _destination.longitude),
+  //       mode: TravelMode.driving,
+  //     ),
+  //     googleApiKey: GOOGLE_API_KEY,
+  //   );
+  //   if (result.points.isNotEmpty) {
+  //     for (var point in result.points) {
+  //       polylineCoordinate.add(LatLng(point.latitude, point.longitude));
+  //     }
+  //   } else {
+  //     print(result.errorMessage);
+  //   }
+  //   return polylineCoordinate;
   // }
 
   void generateCirclesFromPoints(List<LatLng> polylineCoordinates) async {
@@ -303,7 +289,7 @@ class _MapPageState extends State<MapPage> {
       newCircles.add(Circle(
         circleId: CircleId('circle_$i'),
         center: polylineCoordinates[i],
-        radius: 3, // Radius in meters
+        radius: 3,
         fillColor: Colors.red,
         strokeColor: Colors.black,
         strokeWidth: 1,
@@ -316,7 +302,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    _timer?.cancel();
     super.dispose();
   }
 }

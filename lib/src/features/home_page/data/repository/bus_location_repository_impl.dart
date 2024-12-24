@@ -3,6 +3,7 @@ import 'package:bus_app/src/features/home_page/domain/repository/bus_location_re
 import 'package:intl/intl.dart'; // Import the intl package for date formatting
 
 import '../../../../../core/network/dio_client.dart';
+import '../../../../../core/service/shared_preference_service.dart';
 import '../model/bus_location.dart';
 
 class BusLocationRepositoryImpl implements BusLocationRepository {
@@ -12,10 +13,11 @@ class BusLocationRepositoryImpl implements BusLocationRepository {
   Future<List<BusLocationModel>> getBusLocation(List<DateTime> dateTime) async {
     try {
       String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime.first);
-
+      final _prefs = await PrefsService.getInstance();
+      final int? busId = _prefs.getInt(PrefsServiceKeys.busId);
       final response = await _dioClient.post(
         '/get-location-by-date',
-        data: {'bus_id': 2, 'date': formattedDate},
+        data: {'bus_id': busId, 'date': formattedDate},
       );
       if (response.statusCode == 200) {
         List<dynamic> fetchedData = response.data['data'];

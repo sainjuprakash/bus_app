@@ -1,4 +1,5 @@
 import 'package:bus_app/app_localization/l10n.dart';
+import 'package:bus_app/src/features/about_us/presentation/page/about_us_page.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/personal_information/presentation/pages/personal_information_page.dart';
 import 'package:bus_app/src/features/user_interface/presentation/pages/user_interface_page.dart';
@@ -119,6 +120,38 @@ class _ProfilePageState extends State<ProfilePage> {
                               "${l10n.appLanguage},${l10n.theme},${l10n.fontSize}")
                         ],
                       ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 20.0, right: 20.00, top: 5.00, bottom: 5),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AboutUsPage()));
+              },
+              child: Container(
+                height: 70,
+                width: double.maxFinite / 5,
+                decoration:
+                BoxDecoration(borderRadius: BorderRadius.circular(30)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text(l10n.aboutUs,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
