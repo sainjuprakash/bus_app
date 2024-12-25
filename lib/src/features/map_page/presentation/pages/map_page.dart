@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:bus_app/core/service/shared_preference_service.dart';
-import 'package:bus_app/src/constant/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -24,9 +22,6 @@ class _MapPageState extends State<MapPage> {
   final Location _locationController = Location();
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
-  static const LatLng _pGooglePxl = LatLng(27.6898595779013, 85.32115165103747);
-  static const LatLng _destination =
-      LatLng(27.675462605326324, 85.4300373952178);
   LatLng? currentP;
   double currentZoom = 18.0;
   List<LatLng> _polylineCoordinates = [];
@@ -38,7 +33,8 @@ class _MapPageState extends State<MapPage> {
   int selectedNumber = 10;
   final int minNumber = 5;
   final int maxNumber = 120; // You can adjust this as needed
-
+  Duration _elapsedTime = Duration.zero;
+  Timer? _elapsedTimeTimer;
   bool _isTracking = false; // To control location tracking
 
   @override
@@ -56,13 +52,16 @@ class _MapPageState extends State<MapPage> {
     if (!_isTracking) {
       setState(() {
         _isTracking = true;
+        _elapsedTime = Duration.zero;
       });
-      _startTimer(); // Start the periodic task
+      _startTimer();
+      _startElapsedTimeTimer(); // Start the periodic task
     } else {
       setState(() {
         _isTracking = false;
       });
-      _timer?.cancel(); // Stop the periodic task
+      _timer?.cancel();
+      _elapsedTimeTimer?.cancel(); // Stop the periodic task
     }
   }
 
@@ -90,6 +89,25 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  void _startElapsedTimeTimer() {
+    _elapsedTimeTimer?.cancel(); // Cancel any existing timer
+    _elapsedTimeTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() {
+        _elapsedTime =
+            _elapsedTime + const Duration(seconds: 1); // Increment elapsed time
+      });
+    });
+  }
+
+  String _formatElapsedTime() {
+    final hour = _elapsedTime.inHours.remainder(60).toString().padLeft(2, '0');
+    final minutes =
+        _elapsedTime.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        _elapsedTime.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$hour:$minutes:$seconds";
+  }
+
   Future<void> getDataFromSharedPrefs() async {
     final _prefs = await PrefsService.getInstance();
     bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
@@ -99,6 +117,25 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          elevation: 5,
+          title: Center(
+            child: Container(
+              height: MediaQuery.of(context).size.width / 11,
+              width: MediaQuery.of(context).size.width / 2,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Theme.of(context).colorScheme.surface),
+              child: Center(
+                child: Text(
+                  _isTracking ? _formatElapsedTime() : "Status : Not Tracking",
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: 15),
+                ),
+              ),
+            ),
+          )),
       body: currentP == null
           ? const Center(child: Text('Loading...'))
           : Stack(
@@ -123,7 +160,7 @@ class _MapPageState extends State<MapPage> {
                   },
                 ),
                 Align(
-                  alignment: Alignment(0, -0.9),
+                  alignment: Alignment(0, -0.99),
                   child: Container(
                     height: 50,
                     width: double.maxFinite,
@@ -168,17 +205,50 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ),
                 ),
+                Align(
+                  alignment: const Alignment(1, -0.78),
+                  child: Container(
+                    height: 50,
+                    width: 60,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5)),
+                  ),
+                ),
+                Align(
+                  alignment: const Alignment(0.95, -0.77),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    color: Colors.transparent,
+                    child: IconButton(
+                      onPressed: () {
+                        _startTracking();
+                      },
+                      icon: Icon(
+                        _isTracking ? Icons.pause : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor:
+                            _isTracking ? Colors.red : Colors.green,
+                        padding: const EdgeInsets.all(8),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                ),
                 DraggableScrollableSheet(
-                  initialChildSize: 0.05,
-                  minChildSize: 0.05,
+                  initialChildSize: 0.06,
+                  minChildSize: 0.06,
                   maxChildSize: 0.6,
                   builder: (context, scrollController) {
                     return Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                        boxShadow: [
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(20)),
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 5,
@@ -193,7 +263,7 @@ class _MapPageState extends State<MapPage> {
                             height: 5,
                             width: MediaQuery.of(context).size.width / 2,
                             decoration: BoxDecoration(
-                              color: Colors.black54,
+                              color: Theme.of(context).colorScheme.onSurface,
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
@@ -207,11 +277,15 @@ class _MapPageState extends State<MapPage> {
                                       onPressed: () {
                                         _startTracking();
                                       },
+                                      style : ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).colorScheme.onSurface,
+                                      ),
+
                                       child: Text(
                                         _isTracking
                                             ? 'Stop Tracking'
                                             : 'Start Tracking',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: Theme.of(context).colorScheme.surface),
                                       )),
                                 )
                               ],

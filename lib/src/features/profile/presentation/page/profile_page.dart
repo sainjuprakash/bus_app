@@ -41,7 +41,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
         title: const Text('My Maps'),
         elevation: 5,

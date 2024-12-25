@@ -36,7 +36,7 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+     // backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
         title: Text(l10n.myInformation),
         elevation: 5,
@@ -44,11 +44,9 @@ class _PersonalInformationPageState extends State<PersonalInformationPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0), // Adjust padding as needed
         child: Card(
+          color: Theme.of(context).colorScheme.primary,
           elevation: 5,
-          color: Theme.of(context)
-              .colorScheme
-              .onPrimary, // Optional: adds a shadow to the card
-          child: Padding(
+                    child: Padding(
             padding: const EdgeInsets.all(12.0), // Padding inside the card
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

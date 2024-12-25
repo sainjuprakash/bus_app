@@ -68,7 +68,8 @@ class _NavPageState extends State<NavPage> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        elevation: 10,
       ),
     );
   }

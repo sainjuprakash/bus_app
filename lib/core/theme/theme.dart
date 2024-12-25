@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 ThemeData lightMode = ThemeData(
   brightness: Brightness.light,
   colorScheme: const ColorScheme.light(
-    primary: Color(0xFFF0F4F8),
-    onPrimary: Color(0xFFFFFFFF),
-    surface: Colors.white,
-    onSurface: Color(0xFF000000), // Text color for surface
-    secondary: Color(0xFF1B3A57),
-    onSecondary: Color(0xFFFFFFFF),
+    surface: Color(0xFFF0F4F8),
+    onSurface: Color(0xFf1B3A57),
+    primary: Color(0xFFFAFAFA),
+    onPrimary: Color(0xFF1F2833),
+    secondary: Color(0xFFFAFAFA),
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: Color(0xFf1B3A57),
@@ -18,11 +17,13 @@ ThemeData lightMode = ThemeData(
     displayLarge: TextStyle(color: Colors.black),
     bodyLarge: TextStyle(color: Colors.black87),
     titleMedium: TextStyle(color: Colors.black54),
-    labelLarge: TextStyle(color: Colors.white), // TextButton text color for light theme
+    labelLarge:
+        TextStyle(color: Colors.white), // TextButton text color for light theme
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: Colors.white, backgroundColor: const Color(0xFF1B3A57), // Button text color
+      foregroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1B3A57), // Button text color
     ),
   ),
 );
@@ -30,12 +31,12 @@ ThemeData lightMode = ThemeData(
 ThemeData darkMode = ThemeData(
   brightness: Brightness.dark,
   colorScheme: const ColorScheme.dark(
-    primary: Color(0xFF0B0C10),
-    onPrimary: Color(0xFF131B21),
-    surface: Color(0xFF1F2833),
-    onSurface: Color(0xFFFFFFFF), // Text color for surface
-    secondary: Color(0xFF00B7C2),
-    onSecondary: Color(0xFF1F2833),
+    surface: Color(0xFF2A3542),
+    onSurface: Color(0xFFF0F4F8),
+    primary: Color(0xFF1F2833),
+    onPrimary: Color(0xFFF0F4F8),
+    secondary: Color(0xFF2A3542),
+    // Text color for surface
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: Color(0xFF1F2833),
@@ -45,11 +46,14 @@ ThemeData darkMode = ThemeData(
     displayLarge: TextStyle(color: Colors.white),
     bodyLarge: TextStyle(color: Colors.white70),
     titleMedium: TextStyle(color: Colors.white60),
-    labelLarge: TextStyle(color: Colors.black), // TextButton text color for dark theme
+    labelLarge:
+        TextStyle(color: Colors.black), // TextButton text color for dark theme
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: Colors.black, backgroundColor: const Color(0xFF00B7C2), // Button text color for dark theme
+      foregroundColor: Colors.black,
+      backgroundColor:
+          const Color(0xFF00B7C2), // Button text color for dark theme
     ),
   ),
 );

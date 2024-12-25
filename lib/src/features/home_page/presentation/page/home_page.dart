@@ -36,7 +36,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.primary,
         appBar: AppBar(
           title: const Text("GPS Tracking"),
           elevation: 5,
@@ -44,6 +43,7 @@ class _HomePageState extends State<HomePage> {
         body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Card(
+            color: Theme.of(context).colorScheme.primary,
             elevation: 5,
             child: CalendarDatePicker2(
               config: CalendarDatePicker2Config(
