@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DraggableSheetWithHandle extends StatelessWidget {
@@ -10,8 +9,8 @@ class DraggableSheetWithHandle extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Draggable Sheet with Handle"),
       ),
-      body: Center(
-        child: const Text(
+      body: const Center(
+        child: Text(
           "Pull up from the bottom!",
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),

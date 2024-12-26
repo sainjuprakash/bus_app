@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'package:bus_app/core/service/shared_preference_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart' as flutterMap;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:workmanager/workmanager.dart';
-
+import '../../../../constant/map_layers.dart';
+import 'package:latlong2/latlong.dart' as LatLong;
 import '../../../home_page/data/model/bus_location.dart';
 import '../../domain/repository/map_page_repository.dart';
+
+enum MapType { google, osm, satellite }
 
 class MapPage extends StatefulWidget {
   List<BusLocationModel>? busLocationModel;
@@ -19,6 +23,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  MapType _currentMapType = MapType.google;
   final Location _locationController = Location();
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
@@ -44,7 +49,7 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     WakelockPlus.enable();
     getDataFromSharedPrefs();
-    getLocationUpdates(); // We get location updates but don't generate circles until tracking starts
+    getLocationUpdates(); //  get location updates but don't generate circles until tracking starts
   }
 
   // Start tracking location when button is pressed
@@ -140,27 +145,92 @@ class _MapPageState extends State<MapPage> {
           ? const Center(child: Text('Loading...'))
           : Stack(
               children: [
-                GoogleMap(
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController.complete(controller);
-                  },
-                  initialCameraPosition:
-                      CameraPosition(target: currentP!, zoom: currentZoom),
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId('currentLocation'),
-                      icon: BitmapDescriptor.defaultMarker,
-                      position: currentP!,
+                if (_currentMapType == MapType.google)
+                  GoogleMap(
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController.complete(controller);
+                    },
+                    initialCameraPosition:
+                        CameraPosition(target: currentP!, zoom: currentZoom),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('currentLocation'),
+                        icon: BitmapDescriptor.defaultMarker,
+                        position: currentP!,
+                      ),
+                    },
+                    circles: circles,
+                    polylines: Set<Polyline>.of(polylines.values),
+                    onCameraMove: (CameraPosition position) {
+                      currentZoom = position.zoom;
+                    },
+                  )
+                else
+                  flutterMap.FlutterMap(
+                    options: flutterMap.MapOptions(
+                      initialCenter: LatLong.LatLng(
+                          currentP!.latitude, currentP!.longitude),
+                      initialZoom: currentZoom,
+                      interactionOptions: const flutterMap.InteractionOptions(
+                        flags: flutterMap.InteractiveFlag.pinchZoom |
+                            flutterMap.InteractiveFlag.drag,
+                      ),
                     ),
-                  },
-                  circles: circles,
-                  polylines: Set<Polyline>.of(polylines.values),
-                  onCameraMove: (CameraPosition position) {
-                    currentZoom = position.zoom;
-                  },
+                    children: [
+                      if (_currentMapType == MapType.satellite)
+                        TileLayers.satelliteTileLayer,
+                      if (_currentMapType == MapType.osm)
+                        TileLayers.openStreetMapTileLayer,
+                    ],
+                  ),
+                Align(
+                  alignment: const Alignment(-0.98, -0.75),
+                  child: Container(
+                    height: 100,
+                    width: 45,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withOpacity(0.7)),
+                    child: Column(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (_currentMapType == MapType.google) {
+                                  _currentMapType = MapType.satellite;
+                                } else {
+                                  _currentMapType = MapType.google;
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              Icons.satellite_alt,
+                              color: _currentMapType == MapType.satellite
+                                  ? Colors.green
+                                  : Colors.black,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                if (_currentMapType == MapType.google) {
+                                  _currentMapType = MapType.osm;
+                                } else {
+                                  _currentMapType = MapType.google;
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              Icons.map_outlined,
+                              color: _currentMapType == MapType.osm
+                                  ? Colors.green
+                                  : Colors.black,
+                            ))
+                      ],
+                    ),
+                  ),
                 ),
                 Align(
-                  alignment: Alignment(0, -0.99),
+                  alignment: const Alignment(0, -0.99),
                   child: Container(
                     height: 50,
                     width: double.maxFinite,
@@ -239,8 +309,8 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
                 DraggableScrollableSheet(
-                  initialChildSize: 0.06,
-                  minChildSize: 0.06,
+                  initialChildSize: 0.05,
+                  minChildSize: 0.05,
                   maxChildSize: 0.6,
                   builder: (context, scrollController) {
                     return Container(
@@ -260,7 +330,7 @@ class _MapPageState extends State<MapPage> {
                         children: [
                           Container(
                             margin: const EdgeInsets.only(top: 8, bottom: 8),
-                            height: 5,
+                            height: 8,
                             width: MediaQuery.of(context).size.width / 2,
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -277,15 +347,19 @@ class _MapPageState extends State<MapPage> {
                                       onPressed: () {
                                         _startTracking();
                                       },
-                                      style : ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context).colorScheme.onSurface,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                       ),
-
                                       child: Text(
                                         _isTracking
                                             ? 'Stop Tracking'
                                             : 'Start Tracking',
-                                        style: TextStyle(color: Theme.of(context).colorScheme.surface),
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surface),
                                       )),
                                 )
                               ],

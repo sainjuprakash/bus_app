@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as LatLong;
 import 'package:maplibre_gl/maplibre_gl.dart';
+import '../../constant/map_layers.dart';
 
 class MapLibreExample extends StatefulWidget {
   const MapLibreExample({super.key});
@@ -70,8 +71,8 @@ class _MapLibreExampleState extends State<MapLibreExample> {
               ),
               children: [
                 _selectedValue == 'OSM'
-                    ? openStreetMapTileLayer
-                    : satelliteTileLayer,
+                    ? TileLayers.openStreetMapTileLayer
+                    : TileLayers.satelliteTileLayer,
               ],
             ),
         ],
@@ -103,13 +104,18 @@ class _MapLibreExampleState extends State<MapLibreExample> {
   }
 }
 
-TileLayer get openStreetMapTileLayer => TileLayer(
-      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-      userAgentPackageName: 'dev.fleflet.flutter_map.example',
-    );
-
-TileLayer get satelliteTileLayer => TileLayer(
-      urlTemplate:
-          'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
-      userAgentPackageName: 'dev.fleflet.flutter_map.example',
-    );
+// TileLayer get openStreetMapTileLayer => TileLayer(
+//       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+//       userAgentPackageName: 'dev.fleflet.flutter_map.example',
+//     );
+//
+// TileLayer get satelliteTileLayer => TileLayer(
+//       urlTemplate:
+//           'http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+//       userAgentPackageName: 'dev.fleflet.flutter_map.example',
+//     );
+// TileLayer get mapLibre => TileLayer(
+//       urlTemplate:
+//           'https://api.maptiler.com/maps/streets/style.json?key=K1MrUpxtHuXh6mK7E6fK',
+//       userAgentPackageName: 'dev.fleflet.flutter_map.example',
+//     );
