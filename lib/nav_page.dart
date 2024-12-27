@@ -22,27 +22,13 @@ class _NavPageState extends State<NavPage> {
     MapPage(
       mapRepository: MapRepositoryImpl(),
     ),
-    MapLibreExample(),
+    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  final FlutterBackgroundService service = FlutterBackgroundService();
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Monitor the app lifecycle to stop the service on app termination
-    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-      detachedCallBack: () async {
-        service.invoke('stopService');
-      },
-    ));
   }
 
   @override
@@ -73,18 +59,5 @@ class _NavPageState extends State<NavPage> {
         elevation: 10,
       ),
     );
-  }
-}
-
-class LifecycleEventHandler extends WidgetsBindingObserver {
-  final Future<void> Function() detachedCallBack;
-
-  LifecycleEventHandler({required this.detachedCallBack});
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached) {
-      detachedCallBack();
-    }
   }
 }

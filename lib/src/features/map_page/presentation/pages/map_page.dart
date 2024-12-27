@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:bus_app/core/service/shared_preference_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart' as flutterMap;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:workmanager/workmanager.dart';
+import '../../../../../core/service/background_service.dart';
+import '../../../../../main.dart';
 import '../../../../constant/map_layers.dart';
 import 'package:latlong2/latlong.dart' as LatLong;
 import '../../../home_page/data/model/bus_location.dart';
@@ -55,9 +58,10 @@ class _MapPageState extends State<MapPage> {
   // Start tracking location when button is pressed
   void _startTracking() {
     if (!_isTracking) {
-      setState(() {
+      setState(() async {
         _isTracking = true;
         _elapsedTime = Duration.zero;
+        await initializeService();
       });
       _startTimer();
       _startElapsedTimeTimer(); // Start the periodic task
@@ -66,7 +70,17 @@ class _MapPageState extends State<MapPage> {
         _isTracking = false;
       });
       _timer?.cancel();
-      _elapsedTimeTimer?.cancel(); // Stop the periodic task
+      _elapsedTimeTimer?.cancel();
+      Workmanager().initialize(callbackDispatcher);
+      final LifecycleEventHandler lifecycleEventHandler = LifecycleEventHandler(
+        detachedCallBack: () async {
+          final service = FlutterBackgroundService();
+          service.invoke('stopService');
+        },
+      );
+
+      WidgetsBinding.instance
+          .addObserver(lifecycleEventHandler); // Stop the periodic task
     }
   }
 
@@ -170,7 +184,7 @@ class _MapPageState extends State<MapPage> {
                     options: flutterMap.MapOptions(
                       initialCenter: LatLong.LatLng(
                           currentP!.latitude, currentP!.longitude),
-                      initialZoom: currentZoom,
+                      initialZoom: 17,
                       interactionOptions: const flutterMap.InteractionOptions(
                         flags: flutterMap.InteractiveFlag.pinchZoom |
                             flutterMap.InteractiveFlag.drag,
@@ -181,6 +195,19 @@ class _MapPageState extends State<MapPage> {
                         TileLayers.satelliteTileLayer,
                       if (_currentMapType == MapType.osm)
                         TileLayers.openStreetMapTileLayer,
+                      flutterMap.MarkerLayer(markers: [
+                        flutterMap.Marker(
+                          height: 20,
+                          width: 40,
+                          point: LatLong.LatLng(
+                              currentP!.latitude, currentP!.longitude),
+                          child: const Icon(
+                            Icons.location_pin,
+                            color: Colors.red,
+                            size: 30,
+                          ),
+                        )
+                      ]),
                     ],
                   ),
                 Align(
@@ -196,7 +223,8 @@ class _MapPageState extends State<MapPage> {
                         IconButton(
                             onPressed: () {
                               setState(() {
-                                if (_currentMapType == MapType.google) {
+                                if (_currentMapType == MapType.google ||
+                                    _currentMapType == MapType.osm) {
                                   _currentMapType = MapType.satellite;
                                 } else {
                                   _currentMapType = MapType.google;
@@ -212,7 +240,8 @@ class _MapPageState extends State<MapPage> {
                         IconButton(
                             onPressed: () {
                               setState(() {
-                                if (_currentMapType == MapType.google) {
+                                if (_currentMapType == MapType.google ||
+                                    _currentMapType == MapType.satellite) {
                                   _currentMapType = MapType.osm;
                                 } else {
                                   _currentMapType = MapType.google;
@@ -337,34 +366,6 @@ class _MapPageState extends State<MapPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          Expanded(
-                            child: ListView(
-                              controller: scrollController,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        _startTracking();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                      child: Text(
-                                        _isTracking
-                                            ? 'Stop Tracking'
-                                            : 'Start Tracking',
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .surface),
-                                      )),
-                                )
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     );
@@ -452,5 +453,18 @@ class _MapPageState extends State<MapPage> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  final Future<void> Function() detachedCallBack;
+
+  LifecycleEventHandler({required this.detachedCallBack});
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      detachedCallBack();
+    }
   }
 }

@@ -192,7 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),*/
            Divider(
-            color: Theme.of(context).colorScheme.surface, //color of divider
+            color: Theme.of(context).colorScheme.onPrimary, //color of divider
             height: 20, //height spacing of divider
             thickness: 2, //thickness of divider line
             indent: 10, //spacing at the start of divider

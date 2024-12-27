@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:bus_app/src/features/map_page/domain/repository/map_page_repository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gml;
+import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 
 class MapRepositoryImpl extends MapRepository {
   @override
@@ -40,4 +42,7 @@ class MapRepositoryImpl extends MapRepository {
       print('Error sending location: $e');
     }
   }
+
+  @override
+  Future<void> getLocationUpdates() async {}
 }

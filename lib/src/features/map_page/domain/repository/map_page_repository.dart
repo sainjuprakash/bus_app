@@ -6,4 +6,6 @@ abstract class MapRepository {
     required String bearerToken,
     required int busId,
   });
+
+  Future<void> getLocationUpdates();
 }
