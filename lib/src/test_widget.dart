@@ -1,81 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
-class DraggableSheetWithHandle extends StatelessWidget {
-  const DraggableSheetWithHandle({super.key});
+class DistanceTracker extends StatefulWidget {
+  @override
+  _DistanceTrackerState createState() => _DistanceTrackerState();
+}
+
+class _DistanceTrackerState extends State<DistanceTracker> {
+  Position? _lastPosition;
+  double _totalDistance = 0.0; // In meters
+  double _currentSpeed = 0.0; // In meters per second
+
+  @override
+  void initState() {
+    super.initState();
+    _startTracking();
+  }
+
+  void _startTracking() async {
+    // Check and request location permissions
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    Geolocator.getPositionStream(
+      locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 1, // Minimum distance (in meters) to trigger an update
+      ),
+    ).listen((Position position) {
+      if (_lastPosition != null) {
+        final distance = Geolocator.distanceBetween(
+          _lastPosition!.latitude,
+          _lastPosition!.longitude,
+          position.latitude,
+          position.longitude,
+        );
+        setState(() {
+          _totalDistance += distance;
+          _currentSpeed = position.speed; // Speed in m/s
+        });
+      }
+      _lastPosition = position;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Draggable Sheet with Handle"),
+        title: Text("Distance and Speed Tracker"),
       ),
-      body: const Center(
-        child: Text(
-          "Pull up from the bottom!",
-          style: TextStyle(fontSize: 20, color: Colors.white),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                "Total Distance: ${(_totalDistance / 1000).toStringAsFixed(2)} km"),
+            Text(
+                "Current Speed: ${(_currentSpeed * 3.6).toStringAsFixed(2)} km/h"),
+          ],
         ),
-      ),
-      bottomSheet: DraggableScrollableSheet(
-        initialChildSize: 0.05, // Initial size is small
-        minChildSize: 0.05, // Minimum size (almost hidden, but draggable)
-        maxChildSize: 0.6, // Max expanded size
-        builder: (context, scrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 5,
-                  spreadRadius: 1,
-                )
-              ],
-            ),
-            child: Column(
-              children: [
-                // Draggable handle (bold horizontal line)
-                Container(
-                  margin: const EdgeInsets.only(top: 8, bottom: 8),
-                  height: 5,
-                  width: MediaQuery.of(context).size.width/2,
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                // Scrollable content
-                Expanded(
-                  child: ListView(
-                    controller: scrollController,
-                    children: const [
-                      ListTile(
-                        leading: Icon(Icons.info),
-                        title: Text("Option 1"),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.settings),
-                        title: Text("Option 2"),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.share),
-                        title: Text("Option 3"),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.help),
-                        title: Text("Option 4"),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text("Option 5"),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }

@@ -24,8 +24,8 @@ class _AboutUsPageState extends State<AboutUsPage> {
             SizedBox(
               height: 30,
             ),
-            Text('This app is build on the date : 2024 december 25'),
-            Center(child: Text('Version 1.4.2512')),
+            Text('This app is build on the date : 2025 Jan 8'),
+            Center(child: Text('Version 2.0.0801')),
           ],
         ));
   }

@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:bus_app/core/service/shared_preference_service.dart';
+import 'package:bus_app/src/features/map_page/presentation/widgets/draggable_sheet_widget.dart';
+import 'package:bus_app/src/features/map_page/presentation/widgets/haversian_formula.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart' as flutterMap;
+import 'package:geolocator/geolocator.dart' as geoLocator;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../../core/service/background_service.dart';
@@ -27,7 +31,6 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   MapType _currentMapType = MapType.google;
-  final Location _locationController = Location();
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   LatLng? currentP;
@@ -44,24 +47,41 @@ class _MapPageState extends State<MapPage> {
   Duration _elapsedTime = Duration.zero;
   Timer? _elapsedTimeTimer;
   bool _isTracking = false; // To control location tracking
+  geoLocator.Position? _lastPosition;
+  double _totalDistance = 0.0; // In meters
+  double _currentSpeed = 0.0; // In meters per second
+  LatLng? destination = const LatLng(27.6896659, 85.3203204);
 
   @override
   void initState() {
-    // print('------------------------');
-    // print(widget.busLocationModel);
     super.initState();
     WakelockPlus.enable();
+    //_addDestinationCircle();
     getDataFromSharedPrefs();
     getLocationUpdates(); //  get location updates but don't generate circles until tracking starts
+    _startTrackingSpeed();
+  }
+
+  void _addDestinationCircle() {
+    circles.add(
+      Circle(
+        circleId: CircleId("destination"),
+        center: destination!,
+        radius: 50, // Radius in meters
+        fillColor: Colors.blue.withOpacity(0.5),
+        strokeColor: Colors.blue,
+        strokeWidth: 2,
+      ),
+    );
   }
 
   // Start tracking location when button is pressed
   void _startTracking() {
     if (!_isTracking) {
-      setState(() async {
+      setState(() {
         _isTracking = true;
         _elapsedTime = Duration.zero;
-        await initializeService();
+        initializeService();
       });
       _startTimer();
       _startElapsedTimeTimer(); // Start the periodic task
@@ -90,7 +110,7 @@ class _MapPageState extends State<MapPage> {
       if (currentP != null) {
         setState(() {
           _polylineCoordinates.add(currentP!);
-          generateCirclesFromPoints(_polylineCoordinates);
+          updateCircles(_polylineCoordinates);
         });
         widget.mapRepository.sendLocation(
             position: currentP!, bearerToken: bearerToken!, busId: busId!);
@@ -133,6 +153,44 @@ class _MapPageState extends State<MapPage> {
     busId = _prefs.getInt(PrefsServiceKeys.busId);
   }
 
+  void _startTrackingSpeed() async {
+    bool serviceEnabled =
+        await geoLocator.Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await geoLocator.Geolocator.openLocationSettings();
+      return;
+    }
+
+    geoLocator.LocationPermission permission =
+        await geoLocator.Geolocator.checkPermission();
+    if (permission == geoLocator.LocationPermission.denied) {
+      permission = await geoLocator.Geolocator.requestPermission();
+      if (permission == geoLocator.LocationPermission.denied) {
+        return;
+      }
+    }
+    geoLocator.Geolocator.getPositionStream(
+      locationSettings: const geoLocator.LocationSettings(
+          distanceFilter:
+              1, // Minimum distance (in meters) to trigger an update
+          accuracy: geoLocator.LocationAccuracy.high),
+    ).listen((geoLocator.Position position) {
+      if (_lastPosition != null) {
+        final distance = geoLocator.Geolocator.distanceBetween(
+          _lastPosition!.latitude,
+          _lastPosition!.longitude,
+          position.latitude,
+          position.longitude,
+        );
+        setState(() {
+          _totalDistance += distance;
+          _currentSpeed = position.speed; // Speed in m/s
+        });
+      }
+      _lastPosition = position;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,9 +230,13 @@ class _MapPageState extends State<MapPage> {
                         icon: BitmapDescriptor.defaultMarker,
                         position: currentP!,
                       ),
+                      Marker(
+                          markerId: const MarkerId('destination'),
+                          icon: BitmapDescriptor.defaultMarker,
+                          position: destination!)
                     },
                     circles: circles,
-                    polylines: Set<Polyline>.of(polylines.values),
+                    // polylines: Set<Polyline>.of(polylines.values),
                     onCameraMove: (CameraPosition position) {
                       currentZoom = position.zoom;
                     },
@@ -337,40 +399,7 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ),
                 ),
-                DraggableScrollableSheet(
-                  initialChildSize: 0.05,
-                  minChildSize: 0.05,
-                  maxChildSize: 0.6,
-                  builder: (context, scrollController) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(20)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                            spreadRadius: 1,
-                          )
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 8, bottom: 8),
-                            height: 8,
-                            width: MediaQuery.of(context).size.width / 2,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                draggableSheet(_totalDistance, _currentSpeed)
               ],
             ),
     );
@@ -385,67 +414,43 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> getLocationUpdates() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    _serviceEnabled = await _locationController.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _locationController.requestService();
+    final permissionGranted =
+        await widget.mapRepository.checkAndRequestPermissions();
+    bool _hasShownNotification = false;
+    if (!permissionGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Permission not granted!')),
+      );
+      return;
     }
-    _permissionGranted = await _locationController.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _locationController.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
+    try {
+      final locationStream = widget.mapRepository.getLocationUpdate();
+      locationStream.listen((LocationData currentLocation) async {
+        if (currentLocation.longitude != null &&
+            currentLocation.latitude != null) {
+          setState(() {
+            currentP =
+                LatLng(currentLocation.latitude!, currentLocation.longitude!);
+            _cameraToPosition(currentP!);
+          });
+          var distanceBetweenSourceAndDes =
+              haversineDistance(currentP!, destination!);
+          if (distanceBetweenSourceAndDes < 89 && !_hasShownNotification) {
+            setState(() {
+              _hasShownNotification = true;
+            });
+            await widget.mapRepository.sendPushNotification();
+          }
+        }
+      });
+    } catch (e) {
+      print("Error getting location updates: $e");
     }
-    _locationController.onLocationChanged
-        .listen((LocationData currentLocation) {
-      if (currentLocation.longitude != null &&
-          currentLocation.latitude != null) {
-        setState(() {
-          currentP =
-              LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          _cameraToPosition(currentP!);
-        });
-      }
-    });
   }
 
-  // Future<List<LatLng>> getPolylinePoints() async {
-  //   List<LatLng> polylineCoordinate = [];
-  //   PolylinePoints polylinePoints = PolylinePoints();
-  //   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-  //     request: PolylineRequest(
-  //       origin: PointLatLng(_pGooglePxl.latitude, _pGooglePxl.longitude),
-  //       destination: PointLatLng(_destination.latitude, _destination.longitude),
-  //       mode: TravelMode.driving,
-  //     ),
-  //     googleApiKey: GOOGLE_API_KEY,
-  //   );
-  //   if (result.points.isNotEmpty) {
-  //     for (var point in result.points) {
-  //       polylineCoordinate.add(LatLng(point.latitude, point.longitude));
-  //     }
-  //   } else {
-  //     print(result.errorMessage);
-  //   }
-  //   return polylineCoordinate;
-  // }
-
-  void generateCirclesFromPoints(List<LatLng> polylineCoordinates) async {
-    Set<Circle> newCircles = {};
-    for (int i = 0; i < polylineCoordinates.length; i++) {
-      newCircles.add(Circle(
-        circleId: CircleId('circle_$i'),
-        center: polylineCoordinates[i],
-        radius: 3,
-        fillColor: Colors.red,
-        strokeColor: Colors.black,
-        strokeWidth: 1,
-      ));
-    }
+  void updateCircles(List<LatLng> points) {
     setState(() {
-      circles = newCircles;
+      circles = widget.mapRepository.generateCirclesFromPoints(points).toSet();
     });
   }
 

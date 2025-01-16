@@ -1,3 +1,4 @@
+import 'package:bus_app/socket.dart';
 import 'package:bus_app/src/features/map_page/data/repository/map_page_repository_impl.dart';
 import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:bus_app/src/features/home_page/presentation/page/home_page.dart';
@@ -15,7 +16,7 @@ class NavPage extends StatefulWidget {
 }
 
 class _NavPageState extends State<NavPage> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 2;
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),

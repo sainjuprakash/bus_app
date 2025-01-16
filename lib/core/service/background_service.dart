@@ -13,10 +13,9 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
     androidConfiguration: AndroidConfiguration(
-      onStart: onStart,
-      isForegroundMode: true,
-      foregroundServiceNotificationId: 1
-    ),
+        onStart: onStart,
+        isForegroundMode: true,
+        foregroundServiceNotificationId: 1),
   );
   await service.startService();
 }

@@ -7,16 +7,16 @@ import 'package:bus_app/src/features/login_page/data/repository/login_repository
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
-
 import 'app_localization/generated/l10n.dart';
-import 'core/service/background_service.dart';
 import 'core/service/shared_preference_service.dart';
+import 'firebase_options.dart';
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) {
@@ -26,6 +26,10 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  OneSignal.initialize('df22f16f-5671-4ab8-8f8a-87d82c2886e9');
+  OneSignal.Notifications.requestPermission(true);
   await Permission.notification.isDenied.then((value) {
     if (value) {
       Permission.notification.request();
