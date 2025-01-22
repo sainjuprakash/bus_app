@@ -1,5 +1,5 @@
 import 'package:bus_app/main.dart';
-import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
+import 'package:bus_app/src/constant/languge_constant.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showLanguageSelectionDialog(

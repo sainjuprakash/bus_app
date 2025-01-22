@@ -14,6 +14,7 @@ class ImplLoginRepository extends LoginRepository {
         '/login',
         data: {'email': email, 'password': password},
       );
+      print(response);
       if (response.statusCode == 200) {
         final accessToken = response.data['data']['token'];
         final prefs = await PrefsService.getInstance();
@@ -24,6 +25,8 @@ class ImplLoginRepository extends LoginRepository {
             PrefsServiceKeys.driverEmail, response.data['data']['email']);
         await prefs.setString(
             PrefsServiceKeys.driverName, response.data['data']['name']);
+        await prefs.setString(
+            PrefsServiceKeys.role, response.data['data']['role']);
         Endpoints.api_token = accessToken;
         // Endpoints.refreshToken = refreshToken;
       } else {

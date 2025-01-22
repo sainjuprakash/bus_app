@@ -1,12 +1,11 @@
 import 'dart:ui';
-
 import 'package:bus_app/core/theme/theme.dart';
 import 'package:bus_app/nav_page.dart';
 import 'package:bus_app/src/features/home_page/data/repository/bus_location_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
-import 'package:bus_app/src/features/login_page/presentation/widgets/languge_constant.dart';
+import 'package:bus_app/src/constant/languge_constant.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

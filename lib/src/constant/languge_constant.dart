@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../../../../../core/service/shared_preference_service.dart';
+import '../../core/service/shared_preference_service.dart';
 
 const String LANGUAGE_CODE = 'language_code';
 

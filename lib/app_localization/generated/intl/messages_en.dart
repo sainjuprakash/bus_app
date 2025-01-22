@@ -34,15 +34,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "enterValidEmail":
             MessageLookupByLibrary.simpleMessage("Please enter valid email"),
         "fontSize": MessageLookupByLibrary.simpleMessage("Font Size"),
+        "gpsTracking": MessageLookupByLibrary.simpleMessage("GPS Tracking"),
+        "home": MessageLookupByLibrary.simpleMessage("Home"),
         "id": MessageLookupByLibrary.simpleMessage("ID"),
         "logOut": MessageLookupByLibrary.simpleMessage("Log-Out"),
         "login": MessageLookupByLibrary.simpleMessage("Log-In"),
+        "maps": MessageLookupByLibrary.simpleMessage("My Maps"),
         "myInformation": MessageLookupByLibrary.simpleMessage("My Information"),
         "name": MessageLookupByLibrary.simpleMessage("Name"),
         "password": MessageLookupByLibrary.simpleMessage("Password"),
+        "profile": MessageLookupByLibrary.simpleMessage("Profile"),
         "server": MessageLookupByLibrary.simpleMessage("Server"),
         "setAdminPassword":
             MessageLookupByLibrary.simpleMessage("Set Admin Password"),
+        "status": MessageLookupByLibrary.simpleMessage("Status : Not Tracking"),
         "theme": MessageLookupByLibrary.simpleMessage("Theme"),
         "userInterface": MessageLookupByLibrary.simpleMessage("User Interface"),
         "userName": MessageLookupByLibrary.simpleMessage("Username")

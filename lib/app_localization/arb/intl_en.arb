@@ -1,5 +1,6 @@
 {
 "@@locale": "en",
+"gpsTracking" : "GPS Tracking",
 "busApp": "Bus App",
 "busNo" : "Bus No.",
 "login" : "Log-In",
@@ -20,5 +21,9 @@
 "name" : "Name",
 "email" : "Email",
 "id" : "ID",
-"aboutUs" : "About Us"
+"home" : "Home",
+"maps" : "My Maps",
+"profile" : "Profile",
+"aboutUs" : "About Us",
+"status" : "Status : Not Tracking"
 }

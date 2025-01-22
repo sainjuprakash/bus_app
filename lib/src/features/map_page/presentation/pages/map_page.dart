@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bus_app/app_localization/l10n.dart';
 import 'package:bus_app/core/service/shared_preference_service.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/draggable_sheet_widget.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/haversian_formula.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_map/flutter_map.dart' as flutterMap;
 import 'package:geolocator/geolocator.dart' as geoLocator;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../../core/service/background_service.dart';
@@ -36,11 +36,12 @@ class _MapPageState extends State<MapPage> {
   LatLng? currentP;
   double currentZoom = 18.0;
   List<LatLng> _polylineCoordinates = [];
-  Set<Circle> circles = {};
   Map<PolylineId, Polyline> polylines = {};
   Timer? _timer;
   String? bearerToken;
+  Set<Circle> circles = {};
   int? busId;
+  String? role;
   int selectedNumber = 10;
   final int minNumber = 5;
   final int maxNumber = 120; // You can adjust this as needed
@@ -57,6 +58,7 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     WakelockPlus.enable();
     //_addDestinationCircle();
+    widget.mapRepository.getFirstLocation();
     getDataFromSharedPrefs();
     getLocationUpdates(); //  get location updates but don't generate circles until tracking starts
     _startTrackingSpeed();
@@ -65,9 +67,9 @@ class _MapPageState extends State<MapPage> {
   void _addDestinationCircle() {
     circles.add(
       Circle(
-        circleId: CircleId("destination"),
+        circleId: const CircleId("destination"),
         center: destination!,
-        radius: 50, // Radius in meters
+        radius: 80, // Radius in meters
         fillColor: Colors.blue.withOpacity(0.5),
         strokeColor: Colors.blue,
         strokeWidth: 2,
@@ -81,8 +83,8 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         _isTracking = true;
         _elapsedTime = Duration.zero;
-        initializeService();
       });
+      initializeService();
       _startTimer();
       _startElapsedTimeTimer(); // Start the periodic task
     } else {
@@ -151,6 +153,10 @@ class _MapPageState extends State<MapPage> {
     final _prefs = await PrefsService.getInstance();
     bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
     busId = _prefs.getInt(PrefsServiceKeys.busId);
+    role = _prefs.getString(PrefsServiceKeys.role);
+    // LatLng? parentsLocation =
+    //     _prefs.getLatLng(PrefsServiceKeys.parentsLocation);
+    // print(parentsLocation);
   }
 
   void _startTrackingSpeed() async {
@@ -194,25 +200,27 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          elevation: 5,
-          title: Center(
-            child: Container(
-              height: MediaQuery.of(context).size.width / 11,
-              width: MediaQuery.of(context).size.width / 2,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Theme.of(context).colorScheme.surface),
-              child: Center(
-                child: Text(
-                  _isTracking ? _formatElapsedTime() : "Status : Not Tracking",
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 15),
+      appBar: role == 'Driver'
+          ? AppBar(
+              elevation: 5,
+              title: Center(
+                child: Container(
+                  height: MediaQuery.of(context).size.width / 11,
+                  width: MediaQuery.of(context).size.width / 2,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Theme.of(context).colorScheme.surface),
+                  child: Center(
+                    child: Text(
+                      _isTracking ? _formatElapsedTime() : l10n.status,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 15),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          )),
+              ))
+          : null,
       body: currentP == null
           ? const Center(child: Text('Loading...'))
           : Stack(
@@ -230,10 +238,10 @@ class _MapPageState extends State<MapPage> {
                         icon: BitmapDescriptor.defaultMarker,
                         position: currentP!,
                       ),
-                      Marker(
-                          markerId: const MarkerId('destination'),
-                          icon: BitmapDescriptor.defaultMarker,
-                          position: destination!)
+                      // Marker(
+                      //     markerId: const MarkerId('destination'),
+                      //     icon: BitmapDescriptor.defaultMarker,
+                      //     position: destination!),
                     },
                     circles: circles,
                     // polylines: Set<Polyline>.of(polylines.values),
@@ -320,85 +328,95 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ),
                 ),
-                Align(
-                  alignment: const Alignment(0, -0.99),
-                  child: Container(
-                    height: 50,
-                    width: double.maxFinite,
-                    color: Colors.grey.withOpacity(0.6),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: (maxNumber - minNumber) ~/ 5 + 1,
-                      itemBuilder: (context, index) {
-                        int number = minNumber + index * 5;
-                        bool isSelected = number == selectedNumber;
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedNumber = number;
-                              if (_isTracking) {
-                                _startTimer(); // Restart the timer with new interval
-                              }
-                            });
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: 60,
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color:
-                                  isSelected ? Colors.blue : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
+                role == 'Driver'
+                    ? Align(
+                        alignment: const Alignment(0, -0.99),
+                        child: Container(
+                          height: 50,
+                          width: double.maxFinite,
+                          color: Colors.grey.withOpacity(0.6),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: (maxNumber - minNumber) ~/ 5 + 1,
+                            itemBuilder: (context, index) {
+                              int number = minNumber + index * 5;
+                              bool isSelected = number == selectedNumber;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedNumber = number;
+                                    if (_isTracking) {
+                                      _startTimer(); // Restart the timer with new interval
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  width: 60,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Colors.blue
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    "${number.toString()}s",
+                                    style: TextStyle(
+                                      fontSize: isSelected ? 24 : 18,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                role == 'Driver'
+                    ? Align(
+                        alignment: const Alignment(1, -0.78),
+                        child: Container(
+                          height: 50,
+                          width: 60,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5)),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                role == 'Driver'
+                    ? Align(
+                        alignment: const Alignment(0.95, -0.77),
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          color: Colors.transparent,
+                          child: IconButton(
+                            onPressed: () {
+                              _startTracking();
+                            },
+                            icon: Icon(
+                              _isTracking ? Icons.pause : Icons.play_arrow,
+                              color: Colors.white,
                             ),
-                            child: Text(
-                              "${number.toString()}s",
-                              style: TextStyle(
-                                fontSize: isSelected ? 24 : 18,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isSelected ? Colors.white : Colors.black,
-                              ),
+                            style: IconButton.styleFrom(
+                              backgroundColor:
+                                  _isTracking ? Colors.red : Colors.green,
+                              padding: const EdgeInsets.all(8),
+                              elevation: 4,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: const Alignment(1, -0.78),
-                  child: Container(
-                    height: 50,
-                    width: 60,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5)),
-                  ),
-                ),
-                Align(
-                  alignment: const Alignment(0.95, -0.77),
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    color: Colors.transparent,
-                    child: IconButton(
-                      onPressed: () {
-                        _startTracking();
-                      },
-                      icon: Icon(
-                        _isTracking ? Icons.pause : Icons.play_arrow,
-                        color: Colors.white,
-                      ),
-                      style: IconButton.styleFrom(
-                        backgroundColor:
-                            _isTracking ? Colors.red : Colors.green,
-                        padding: const EdgeInsets.all(8),
-                        elevation: 4,
-                      ),
-                    ),
-                  ),
-                ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
                 draggableSheet(_totalDistance, _currentSpeed)
               ],
             ),
@@ -435,7 +453,8 @@ class _MapPageState extends State<MapPage> {
           });
           var distanceBetweenSourceAndDes =
               haversineDistance(currentP!, destination!);
-          if (distanceBetweenSourceAndDes < 89 && !_hasShownNotification) {
+          if (distanceBetweenSourceAndDes < 60 &&
+              _hasShownNotification == false) {
             setState(() {
               _hasShownNotification = true;
             });

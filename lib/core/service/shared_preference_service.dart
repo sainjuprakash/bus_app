@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsServiceKeys {
@@ -7,6 +8,8 @@ class PrefsServiceKeys {
   static const String busId = 'busID';
   static const String driverEmail = 'driverEmail';
   static const String driverName = 'driverName';
+  static const String role = 'role';
+  static const String parentsLocation = 'parentsLocation';
 }
 
 class PrefsService {
@@ -57,6 +60,11 @@ class PrefsService {
   Future<bool> setStringList(String key, List<String> value) =>
       _sharedPreferences.setStringList(key, value);
 
+  void setLatLng(String key, LatLng value) {
+    String latLngString = '${value.latitude},${value.longitude}';
+    _sharedPreferences.setString(key, latLngString);
+  }
+
   /// Reads a value from persistent storage, throwing an exception if it's not a double.
   double? getDouble(String key) => _sharedPreferences.getDouble(key);
 
@@ -72,6 +80,17 @@ class PrefsService {
   /// Reads a set of string values from persistent storage, throwing an exception if it's not a string set.
   List<String>? getStringList(String key) =>
       _sharedPreferences.getStringList(key);
+
+  LatLng? getLatLng(String key) {
+    String? latLngString = _sharedPreferences.getString(key);
+    if (latLngString != null) {
+      List<String> parts = latLngString.split(',');
+      if (parts.length == 2) {
+        return LatLng(double.parse(parts[0]), double.parse(parts[1]));
+      }
+    }
+    return null;
+  }
 
   /// Fetches the latest values from the host platform.
   ///

@@ -34,14 +34,20 @@ class MessageLookup extends MessageLookupByLibrary {
         "enterValidEmail":
             MessageLookupByLibrary.simpleMessage("कृपया मान्य इमेल राख्नुहोस्"),
         "fontSize": MessageLookupByLibrary.simpleMessage("फोन्त साइज"),
+        "gpsTracking": MessageLookupByLibrary.simpleMessage("जीपीएस ट्र्याकिङ"),
+        "home": MessageLookupByLibrary.simpleMessage("होम"),
         "id": MessageLookupByLibrary.simpleMessage("आईडी"),
         "logOut": MessageLookupByLibrary.simpleMessage("लग-आउट"),
         "login": MessageLookupByLibrary.simpleMessage("लग-इन"),
+        "maps": MessageLookupByLibrary.simpleMessage("नक्सा"),
+        "myInformation": MessageLookupByLibrary.simpleMessage("मेरो जानकारी"),
         "name": MessageLookupByLibrary.simpleMessage("नाम"),
         "password": MessageLookupByLibrary.simpleMessage("पासवर्ड"),
+        "profile": MessageLookupByLibrary.simpleMessage("प्रोफाइल"),
         "server": MessageLookupByLibrary.simpleMessage("सर्भर"),
         "setAdminPassword": MessageLookupByLibrary.simpleMessage(
             "प्रशासक पासवर्ड सेट गर्नुहोस्"),
+        "status": MessageLookupByLibrary.simpleMessage("स्थिति: ट्र्याकिङ छैन"),
         "theme": MessageLookupByLibrary.simpleMessage("थेम"),
         "userInterface":
             MessageLookupByLibrary.simpleMessage("प्रयोगकर्ता इन्टरफेस"),

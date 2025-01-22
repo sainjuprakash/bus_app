@@ -10,6 +10,7 @@ abstract class MapRepository {
 
   Future<bool> checkAndRequestPermissions();
   Stream<LocationData> getLocationUpdate();
+  Future<LocationData?> getFirstLocation();
   Stream<double?> getCompassHeading();
   List<gml.Circle> generateCirclesFromPoints(List<gml.LatLng> points);
   Future<void> sendPushNotification();

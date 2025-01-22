@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:bus_app/app_localization/l10n.dart';
 import 'package:bus_app/socket.dart';
 import 'package:bus_app/src/features/map_page/data/repository/map_page_repository_impl.dart';
 import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
@@ -16,7 +19,7 @@ class NavPage extends StatefulWidget {
 }
 
 class _NavPageState extends State<NavPage> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 1;
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
@@ -39,18 +42,18 @@ class _NavPageState extends State<NavPage> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home),
+            label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map_rounded),
-            label: 'My Map',
+            icon: const Icon(Icons.map_rounded),
+            label: l10n.maps,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person),
+            label: l10n.profile,
           ),
         ],
         currentIndex: _selectedIndex,

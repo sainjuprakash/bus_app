@@ -13,11 +13,13 @@ import 'endpoints.dart';
 
 /// This interceptor is used to show request and response logs
 class LoggerInterceptor extends Interceptor {
-  Logger logger =
-      Logger(printer: PrettyPrinter(methodCount: 0, printTime: true));
+  Logger logger = Logger(
+      printer: PrettyPrinter(
+          methodCount: 0,
+          dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart));
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     final options = err.requestOptions;
     final requestPath = '${options.baseUrl}${options.path}';
     logger.e('${options.method} request ==> $requestPath'); //Error log

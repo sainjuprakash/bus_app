@@ -5,9 +5,9 @@ import 'package:bus_app/src/features/personal_information/presentation/pages/per
 import 'package:bus_app/src/features/user_interface/presentation/pages/user_interface_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../../core/network/endpoints.dart';
 import '../../../../../core/service/shared_preference_service.dart';
+import '../../../map_page/data/repository/map_page_repository_impl.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,10 +17,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  MapRepositoryImpl mapRepositoryImpl = MapRepositoryImpl();
   String? driverName = '';
 
   @override
   void initState() {
+    // mapRepositoryImpl.getFirstLocation();
     super.initState();
     getSharedPrefsData();
   }
@@ -42,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Maps'),
+        title: Text(l10n.profile),
         elevation: 5,
       ),
       body: Column(
@@ -102,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Row(
                     children: [
                       const Icon(Icons.color_lens_outlined),
@@ -139,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 70,
                 width: double.maxFinite / 5,
                 decoration:
-                BoxDecoration(borderRadius: BorderRadius.circular(30)),
+                    BoxDecoration(borderRadius: BorderRadius.circular(30)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -191,7 +193,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),*/
-           Divider(
+          Divider(
             color: Theme.of(context).colorScheme.onPrimary, //color of divider
             height: 20, //height spacing of divider
             thickness: 2, //thickness of divider line

@@ -9,11 +9,14 @@ import 'package:bus_app/src/features/map_page/domain/repository/map_page_reposit
 import 'package:location/location.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+import '../../../../../core/service/shared_preference_service.dart';
+
 class MapRepositoryImpl extends MapRepository {
   final Location _locationController = Location();
   geoLocator.Position? _lastPosition;
   double _totalDistance = 0.0; // Total distance in meters
   double _currentSpeed = 0.0;
+
   final StreamController<double> _speedController =
       StreamController<double>.broadcast();
   @override
@@ -126,6 +129,33 @@ class MapRepositoryImpl extends MapRepository {
       print('Notification sent successfully.');
     } else {
       print('Failed to send notification: ${response.body}');
+    }
+  }
+
+  @override
+  Future<LocationData?> getFirstLocation() async {
+    try {
+      bool hasPermission = await checkAndRequestPermissions();
+      if (!hasPermission) {
+        print('Location permission not granted.');
+        return null;
+      }
+
+      bool serviceEnabled = await _locationController.serviceEnabled();
+      if (!serviceEnabled) {
+        print('Location services are not enabled.');
+        return null;
+      }
+      // Get the first location data
+      LocationData firstLocation = await _locationController.getLocation();
+      LatLng parentsLocation =
+          LatLng(firstLocation.latitude!, firstLocation.longitude!);
+      print(
+          'First location: ${firstLocation.latitude}, ${firstLocation.longitude}');
+      return firstLocation;
+    } catch (e) {
+      print('Error retrieving first location: $e');
+      return null;
     }
   }
 }

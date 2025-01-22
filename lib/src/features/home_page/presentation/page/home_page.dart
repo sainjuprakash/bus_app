@@ -1,8 +1,6 @@
 import 'package:bus_app/app_localization/l10n.dart';
 import 'package:bus_app/src/features/bus_location_history/presentation/page/bus_location_history_page.dart';
 import 'package:bus_app/src/features/home_page/data/model/bus_location.dart';
-import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
-import 'package:bus_app/src/map_libre/presentation/map_libre_page.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("GPS Tracking"),
+          title:  Text(l10n.gpsTracking),
           elevation: 5,
         ),
         body: Padding(
@@ -67,7 +65,7 @@ class _HomePageState extends State<HomePage> {
               onValueChanged: (dates) {
                 setState(() {
                   _dates = dates;
-                  print(_dates);
+                  //print(_dates);
                 });
                 Navigator.push(
                     context,
@@ -99,7 +97,9 @@ class _HomePageState extends State<HomePage> {
                                       busCoordinates
                                           .add(LatLng(latitude, longitude));
                                     }
-                                    return BusLocationHistoryPage(locationHistory: busCoordinates,);
+                                    return BusLocationHistoryPage(
+                                      locationHistory: busCoordinates,
+                                    );
                                   }
                                   if (state is BusLocationFailureState) {
                                     return const Center(

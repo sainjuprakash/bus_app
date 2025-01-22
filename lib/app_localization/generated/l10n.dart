@@ -50,6 +50,16 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `GPS Tracking`
+  String get gpsTracking {
+    return Intl.message(
+      'GPS Tracking',
+      name: 'gpsTracking',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Bus App`
   String get busApp {
     return Intl.message(
@@ -240,11 +250,51 @@ class AppLocalizations {
     );
   }
 
+  /// `Home`
+  String get home {
+    return Intl.message(
+      'Home',
+      name: 'home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Maps`
+  String get maps {
+    return Intl.message(
+      'My Maps',
+      name: 'maps',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Profile`
+  String get profile {
+    return Intl.message(
+      'Profile',
+      name: 'profile',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `About Us`
   String get aboutUs {
     return Intl.message(
       'About Us',
       name: 'aboutUs',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Status : Not Tracking`
+  String get status {
+    return Intl.message(
+      'Status : Not Tracking',
+      name: 'status',
       desc: '',
       args: [],
     );
