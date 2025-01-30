@@ -7,9 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:bus_app/src/features/map_page/domain/repository/map_page_repository.dart';
 import 'package:location/location.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
-
-import '../../../../../core/service/shared_preference_service.dart';
 
 class MapRepositoryImpl extends MapRepository {
   final Location _locationController = Location();

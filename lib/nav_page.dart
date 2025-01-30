@@ -1,18 +1,14 @@
-import 'dart:math';
-
 import 'package:bus_app/app_localization/l10n.dart';
-import 'package:bus_app/socket.dart';
 import 'package:bus_app/src/features/map_page/data/repository/map_page_repository_impl.dart';
 import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:bus_app/src/features/home_page/presentation/page/home_page.dart';
 import 'package:bus_app/src/features/profile/presentation/page/profile_page.dart';
-import 'package:bus_app/src/map_libre/presentation/map_libre_page.dart';
-import 'package:bus_app/src/test_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+
+import 'core/service/shared_preference_service.dart';
 
 class NavPage extends StatefulWidget {
-  const NavPage({super.key});
+  NavPage({super.key});
 
   @override
   State<NavPage> createState() => _NavPageState();
@@ -20,14 +16,19 @@ class NavPage extends StatefulWidget {
 
 class _NavPageState extends State<NavPage> {
   int _selectedIndex = 1;
+  bool isTracking = false;
+  @override
+  void initState() {
+    super.initState();
+    getDataFromSharedPrefs();
+  }
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const HomePage(),
-    MapPage(
-      mapRepository: MapRepositoryImpl(),
-    ),
-    ProfilePage(),
-  ];
+  Future<void> getDataFromSharedPrefs() async {
+    final _prefs = await PrefsService.getInstance();
+    isTracking = _prefs.getBool(PrefsServiceKeys.isTracking)!;
+    print('---------------------------------');
+    print(isTracking);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -37,31 +38,42 @@ class _NavPageState extends State<NavPage> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _widgetOptions = <Widget>[
+      const HomePage(),
+      MapPage(
+        mapRepository: MapRepositoryImpl(),
+      ),
+      const ProfilePage(),
+    ];
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: l10n.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.map_rounded),
-            label: l10n.maps,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: l10n.profile,
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onItemTapped,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        elevation: 10,
-      ),
+      // Conditionally show/hide the BottomNavigationBar
+      bottomNavigationBar: isTracking
+          ? null // Hide the bottom navigation bar when isTracking is true
+          : BottomNavigationBar(
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.home),
+                  label: l10n.home,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.map_rounded),
+                  label: l10n.maps,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.person),
+                  label: l10n.profile,
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.blue,
+              onTap: _onItemTapped,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              elevation: 10,
+            ),
     );
   }
 }

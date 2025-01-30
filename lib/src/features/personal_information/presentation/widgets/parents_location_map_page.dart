@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bus_app/src/constant/custom_alret_dialogue.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -58,27 +59,12 @@ class _ParentsLocationMapPageState extends State<ParentsLocationMapPage> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text("Confirmation"),
-                            content: const Text(
-                                "Are you sure you want to update your location?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Cancel"),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // Handle the "Yes" action here
-                                  Navigator.of(context)
-                                      .pop(); // Close the dialog
-                                },
-                                child: const Text("Yes"),
-                              ),
-                            ],
-                          );
+                          return CustomAlertDialogue(
+                              title: "Alert",
+                              content: "Update your location ?",
+                              onConfirm: () {
+                                Navigator.of(context).pop();
+                              });
                         },
                       );
                     },

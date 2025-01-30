@@ -3,7 +3,6 @@ import 'package:bus_app/src/features/about_us/presentation/page/about_us_page.da
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/features/personal_information/presentation/pages/personal_information_page.dart';
 import 'package:bus_app/src/features/user_interface/presentation/pages/user_interface_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../../../../core/network/endpoints.dart';
 import '../../../../../core/service/shared_preference_service.dart';

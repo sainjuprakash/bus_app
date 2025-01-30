@@ -9,6 +9,7 @@ class PrefsServiceKeys {
   static const String driverEmail = 'driverEmail';
   static const String driverName = 'driverName';
   static const String role = 'role';
+  static const String isTracking = '';
   static const String parentsLocation = 'parentsLocation';
 }
 

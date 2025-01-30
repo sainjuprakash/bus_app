@@ -7,7 +7,7 @@ class LocationService {
 
   Stream<Position> getPositionStream() {
     return Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
+      locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 1, // in meters
       ),
@@ -35,7 +35,7 @@ class LocationService {
         _totalDistance += distance;
 
         final timeInSeconds =
-            position.timestamp!.difference(_lastPosition!.timestamp!).inSeconds;
+            position.timestamp.difference(_lastPosition!.timestamp).inSeconds;
         final speed = distance / timeInSeconds; // Speed in meters per second
 
         print('Distance covered: ${_totalDistance.toStringAsFixed(2)} m');

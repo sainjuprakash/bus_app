@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               oldRoute: ModalRoute.of(context)!,
               newRoute: MaterialPageRoute(builder: (context) => MyHomePage()));*/
           Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const NavPage()),
+              MaterialPageRoute(builder: (context) =>  NavPage()),
               (route) => false);
         }
         if (state is LoginInProcessState) {

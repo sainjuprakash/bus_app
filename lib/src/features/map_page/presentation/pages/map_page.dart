@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bus_app/app_localization/l10n.dart';
 import 'package:bus_app/core/service/shared_preference_service.dart';
+import 'package:bus_app/src/constant/custom_alret_dialogue.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/draggable_sheet_widget.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/haversian_formula.dart';
 import 'package:flutter/material.dart';
@@ -78,9 +79,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   // Start tracking location when button is pressed
-  void _startTracking() {
+  Future<void> _startTracking() async {
+    final _prefs = await PrefsService.getInstance();
     if (!_isTracking) {
       setState(() {
+        _prefs.setBool(PrefsServiceKeys.isTracking, true);
         _isTracking = true;
         _elapsedTime = Duration.zero;
       });
@@ -89,6 +92,7 @@ class _MapPageState extends State<MapPage> {
       _startElapsedTimeTimer(); // Start the periodic task
     } else {
       setState(() {
+        _prefs.setBool(PrefsServiceKeys.isTracking, false);
         _isTracking = false;
       });
       _timer?.cancel();
@@ -154,9 +158,6 @@ class _MapPageState extends State<MapPage> {
     bearerToken = _prefs.getString(PrefsServiceKeys.accessTokem);
     busId = _prefs.getInt(PrefsServiceKeys.busId);
     role = _prefs.getString(PrefsServiceKeys.role);
-    // LatLng? parentsLocation =
-    //     _prefs.getLatLng(PrefsServiceKeys.parentsLocation);
-    // print(parentsLocation);
   }
 
   void _startTrackingSpeed() async {
@@ -401,7 +402,18 @@ class _MapPageState extends State<MapPage> {
                           color: Colors.transparent,
                           child: IconButton(
                             onPressed: () {
-                              _startTracking();
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CustomAlertDialogue(
+                                        title: "Tracking Alert",
+                                        content: !_isTracking
+                                            ? "Start tracking your location ?"
+                                            : "Stop tracking your location ?",
+                                        onConfirm: () {
+                                          _startTracking();
+                                        });
+                                  });
                             },
                             icon: Icon(
                               _isTracking ? Icons.pause : Icons.play_arrow,

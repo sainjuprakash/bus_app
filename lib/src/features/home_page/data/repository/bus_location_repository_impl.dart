@@ -1,4 +1,3 @@
-import 'package:bus_app/src/features/home_page/data/model/bus_location_response.dart';
 import 'package:bus_app/src/features/home_page/domain/repository/bus_location_repository.dart';
 import 'package:intl/intl.dart'; // Import the intl package for date formatting
 
@@ -21,6 +20,7 @@ class BusLocationRepositoryImpl implements BusLocationRepository {
       );
       if (response.statusCode == 200) {
         List<dynamic> fetchedData = response.data['data'];
+        print(fetchedData);
         return fetchedData.map((e) => BusLocationModel.fromJson(e)).toList();
       } else {
         throw Exception(response.statusCode);

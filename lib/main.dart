@@ -2,10 +2,12 @@ import 'dart:ui';
 import 'package:bus_app/core/theme/theme.dart';
 import 'package:bus_app/nav_page.dart';
 import 'package:bus_app/src/features/home_page/data/repository/bus_location_repository_impl.dart';
+import 'package:bus_app/src/features/live_location/data/repository/live_location_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/data/repository/login_repository_impl.dart';
 import 'package:bus_app/src/features/login_page/presentation/bloc/login_bloc.dart';
 import 'package:bus_app/src/features/login_page/presentation/page/login_page.dart';
 import 'package:bus_app/src/constant/languge_constant.dart';
+import 'package:bus_app/src/features/map_page/data/repository/map_page_repository_impl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +37,7 @@ void main() async {
     }
   });
   //await initializeService();
-  // Workmanager().initialize(callbackDispatcher);
+  Workmanager().initialize(callbackDispatcher);
   // final LifecycleEventHandler lifecycleEventHandler = LifecycleEventHandler(
   //   detachedCallBack: () async {
   //     final service = FlutterBackgroundService();
@@ -103,6 +105,8 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(
           create: (context) => BusLocationRepositoryImpl(),
         ),
+        RepositoryProvider(create: (context) => LiveLocationImpl()),
+        // RepositoryProvider(create: (context) => MapRepositoryImpl()),
       ],
       child: BlocProvider(
         create: (context) => LoginBloc(
@@ -124,7 +128,7 @@ class _MyAppState extends State<MyApp> {
           locale: _locale,
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
-          home: !isUserLoggedIn ? const LoginPage() : const NavPage(),
+          home: !isUserLoggedIn ? const LoginPage() : NavPage(),
         ),
       ),
     );
