@@ -33,16 +33,22 @@ void onStart(ServiceInstance service) async {
 
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
+      print(
+          "----------------Foreground service invoked------------------------");
       service.setAsForegroundService();
     });
 
     service.on('setAsBackground').listen((event) {
+      print(
+          "----------------Background service invoked------------------------");
       service.setAsBackgroundService();
     });
   }
 
   service.on('stopService').listen((event) {
-    service.stopSelf(); // Stop the service explicitly
+    service.stopSelf();
+    print(
+        "-------------------background service invoked-------------------"); // Stop the service explicitly
   });
 
   Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -58,7 +64,6 @@ void onStart(ServiceInstance service) async {
       } else {
         // Stop the service if the app is not in the foreground
         timer.cancel();
-        service.stopSelf();
       }
     }
   });

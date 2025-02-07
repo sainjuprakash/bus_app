@@ -37,3 +37,5 @@ class MapTrackingState extends MapState {
   @override
   List<Object?> get props => [polylinePoints, elapsedTime, isTracking];
 }
+
+class MapFailureState extends MapState {}

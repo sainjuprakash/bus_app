@@ -24,8 +24,11 @@ class _AboutUsPageState extends State<AboutUsPage> {
             SizedBox(
               height: 30,
             ),
-            Text('This app is build on the date : 2025 Jan 8'),
-            Center(child: Text('Version 2.0.0801')),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                  'A real-time GPS tracking app designed to monitor school buses, ensuring accurate location updates and enhancing student transportation safety and efficiency.'),
+            ),
           ],
         ));
   }

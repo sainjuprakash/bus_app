@@ -4,7 +4,6 @@ import 'package:bus_app/src/features/map_page/presentation/pages/map_page.dart';
 import 'package:bus_app/src/features/home_page/presentation/page/home_page.dart';
 import 'package:bus_app/src/features/profile/presentation/page/profile_page.dart';
 import 'package:flutter/material.dart';
-
 import 'core/service/shared_preference_service.dart';
 
 class NavPage extends StatefulWidget {

@@ -31,21 +31,12 @@ void main() async {
   //OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.initialize('df22f16f-5671-4ab8-8f8a-87d82c2886e9');
   OneSignal.Notifications.requestPermission(true);
-  await Permission.notification.isDenied.then((value) {
-    if (value) {
-      Permission.notification.request();
-    }
-  });
-  //await initializeService();
-  Workmanager().initialize(callbackDispatcher);
-  // final LifecycleEventHandler lifecycleEventHandler = LifecycleEventHandler(
-  //   detachedCallBack: () async {
-  //     final service = FlutterBackgroundService();
-  //     service.invoke('stopService');
-  //   },
-  // );
-  //
-  // WidgetsBinding.instance.addObserver(lifecycleEventHandler);
+  // await Permission.notification.isDenied.then((value) {
+  //   if (value) {
+  //     Permission.notification.request();
+  //   }
+  // });
+
   runApp(const MyApp());
 }
 
@@ -106,7 +97,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => BusLocationRepositoryImpl(),
         ),
         RepositoryProvider(create: (context) => LiveLocationImpl()),
-        // RepositoryProvider(create: (context) => MapRepositoryImpl()),
+        RepositoryProvider(create: (context) => MapRepositoryImpl()),
       ],
       child: BlocProvider(
         create: (context) => LoginBloc(
@@ -134,16 +125,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// class LifecycleEventHandler extends WidgetsBindingObserver {
-//   final Future<void> Function() detachedCallBack;
-//
-//   LifecycleEventHandler({required this.detachedCallBack});
-//
-//   @override
-//   void didChangeAppLifecycleState(AppLifecycleState state) {
-//     if (state == AppLifecycleState.detached) {
-//       detachedCallBack();
-//     }
-//   }
-// }

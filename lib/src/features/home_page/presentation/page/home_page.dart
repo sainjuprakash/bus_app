@@ -119,27 +119,27 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
-              Card(
-                child: BlocProvider(
-                  create: (context) => LiveLocationBloc(
-                      RepositoryProvider.of<LiveLocationImpl>(context))
-                    ..startFetching(),
-                  child: BlocBuilder<LiveLocationBloc, LiveLocationState>(
-                      builder: (context, state) {
-                    if (state is LiveLocationInitialState) {
-                      return const CircularProgressIndicator();
-                    }
-                    if (state is LiveLocationLoadedState) {
-                      final data = state.latLng;
-                      return Text(data.toString());
-                    }
-                    if (state is LiveLocationErrorState) {
-                      return Text(state.message);
-                    }
-                    return const Center(child: Text('Unable to load data'));
-                  }),
-                ),
-              )
+              // Card(
+              //   child: BlocProvider(
+              //     create: (context) => LiveLocationBloc(
+              //         RepositoryProvider.of<LiveLocationImpl>(context))
+              //       ..startFetching(),
+              //     child: BlocBuilder<LiveLocationBloc, LiveLocationState>(
+              //         builder: (context, state) {
+              //       if (state is LiveLocationInitialState) {
+              //         return const CircularProgressIndicator();
+              //       }
+              //       if (state is LiveLocationLoadedState) {
+              //         final data = state.latLng;
+              //         return Text(data.toString());
+              //       }
+              //       if (state is LiveLocationErrorState) {
+              //         return Text(state.message);
+              //       }
+              //       return const Center(child: Text('Unable to load data'));
+              //     }),
+              //   ),
+              // )
             ],
           ),
         ));

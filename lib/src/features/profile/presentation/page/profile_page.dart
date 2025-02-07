@@ -149,9 +149,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text(l10n.aboutUs,
-                          style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      Column(
+                        children: [
+                          Text(l10n.aboutUs,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('V2.1.0302'),
+                        ],
+                      ),
                     ],
                   ),
                 ),

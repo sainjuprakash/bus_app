@@ -13,17 +13,23 @@ class MapRepositoryImpl extends MapRepository {
   geoLocator.Position? _lastPosition;
   double _totalDistance = 0.0; // Total distance in meters
   double _currentSpeed = 0.0;
-
+  Timer? _timer;
+  Timer? _elapsedTimeTimer;
+  Duration _elapsedTime = Duration.zero;
+  bool _isTracking = false;
   final StreamController<double> _speedController =
       StreamController<double>.broadcast();
+
   @override
   Stream<double> get speedStream => _speedController.stream;
 
   @override
-  Future<void> sendLocation(
-      {required LatLng position,
-      required String bearerToken,
-      required int busId}) async {
+  Future<void> sendLocation({
+    required LatLng position,
+    required String bearerToken,
+    required int busId,
+    bool? isStart,
+  }) async {
     const String url = 'https://gps.git.com.np/api/v1/location-update';
 
     DateTime now = DateTime.now();
@@ -43,6 +49,8 @@ class MapRepositoryImpl extends MapRepository {
           'latitude': position.latitude,
           'longitude': position.longitude,
           'time': formattedTime,
+          'is_start': isStart == false ? 1 : 0,
+          'is_end': isStart == true ? 1 : 0,
         }),
       );
       if (response.statusCode != 200) {
@@ -132,11 +140,11 @@ class MapRepositoryImpl extends MapRepository {
   @override
   Future<LocationData?> getFirstLocation() async {
     try {
-      bool hasPermission = await checkAndRequestPermissions();
-      if (!hasPermission) {
-        print('Location permission not granted.');
-        return null;
-      }
+      // bool hasPermission = await checkAndRequestPermissions();
+      // if (!hasPermission) {
+      //   print('Location permission not granted.');
+      //   return null;
+      // }
 
       bool serviceEnabled = await _locationController.serviceEnabled();
       if (!serviceEnabled) {
@@ -154,5 +162,101 @@ class MapRepositoryImpl extends MapRepository {
       print('Error retrieving first location: $e');
       return null;
     }
+  }
+
+  @override
+  String formatElapsedTime() {
+    final hour = _elapsedTime.inHours.remainder(60).toString().padLeft(2, '0');
+    final minutes =
+        _elapsedTime.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds =
+        _elapsedTime.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$hour:$minutes:$seconds";
+  }
+
+  @override
+  double getTotalDistance() => _totalDistance;
+
+  @override
+  double getCurrentSpeed() => _currentSpeed;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _elapsedTimeTimer?.cancel();
+    _speedController.close();
+  }
+
+  @override
+  void startTracking(
+      {required int selectedNumber,
+      required Function(LatLng) onLocationUpdate}) {
+    if (!_isTracking) {
+      _isTracking = true;
+      _elapsedTime = Duration.zero;
+      _startTimer(selectedNumber, onLocationUpdate);
+      _startElapsedTimeTimer();
+    } else {
+      _isTracking = false;
+      _timer?.cancel();
+      _elapsedTimeTimer?.cancel();
+    }
+  }
+
+  void _startTimer(int selectedNumber, Function(LatLng) onLocationUpdate) {
+    _timer?.cancel(); // Cancel the existing timer if any
+    _timer = Timer.periodic(Duration(seconds: selectedNumber), (Timer t) {
+      if (_lastPosition != null) {
+        LatLng currentP =
+            LatLng(_lastPosition!.latitude, _lastPosition!.longitude);
+        onLocationUpdate(currentP);
+      }
+    });
+  }
+
+  void _startElapsedTimeTimer() {
+    _elapsedTimeTimer?.cancel(); // Cancel any existing timer
+    _elapsedTimeTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _elapsedTime =
+          _elapsedTime + const Duration(seconds: 1); // Increment elapsed time
+    });
+  }
+
+  @override
+  void startTrackingSpeed() async {
+    bool serviceEnabled =
+        await geoLocator.Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await geoLocator.Geolocator.openLocationSettings();
+      return;
+    }
+
+    geoLocator.LocationPermission permission =
+        await geoLocator.Geolocator.checkPermission();
+    if (permission == geoLocator.LocationPermission.denied) {
+      permission = await geoLocator.Geolocator.requestPermission();
+      if (permission == geoLocator.LocationPermission.denied) {
+        return;
+      }
+    }
+    geoLocator.Geolocator.getPositionStream(
+      locationSettings: const geoLocator.LocationSettings(
+          distanceFilter:
+              1, // Minimum distance (in meters) to trigger an update
+          accuracy: geoLocator.LocationAccuracy.high),
+    ).listen((geoLocator.Position position) {
+      if (_lastPosition != null) {
+        final distance = geoLocator.Geolocator.distanceBetween(
+          _lastPosition!.latitude,
+          _lastPosition!.longitude,
+          position.latitude,
+          position.longitude,
+        );
+        _totalDistance += distance;
+        _currentSpeed = position.speed; // Speed in m/s
+        _speedController.add(_currentSpeed);
+      }
+      _lastPosition = position;
+    });
   }
 }

@@ -5,6 +5,7 @@ import 'package:bus_app/src/constant/custom_alret_dialogue.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/draggable_sheet_widget.dart';
 import 'package:bus_app/src/features/map_page/presentation/widgets/haversian_formula.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart' as flutterMap;
 import 'package:geolocator/geolocator.dart' as geoLocator;
@@ -59,7 +60,7 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     WakelockPlus.enable();
     //_addDestinationCircle();
-    widget.mapRepository.getFirstLocation();
+    // widget.mapRepository.getFirstLocation();
     getDataFromSharedPrefs();
     getLocationUpdates(); //  get location updates but don't generate circles until tracking starts
     _startTrackingSpeed();
@@ -97,16 +98,8 @@ class _MapPageState extends State<MapPage> {
       });
       _timer?.cancel();
       _elapsedTimeTimer?.cancel();
-      Workmanager().initialize(callbackDispatcher);
-      final LifecycleEventHandler lifecycleEventHandler = LifecycleEventHandler(
-        detachedCallBack: () async {
-          final service = FlutterBackgroundService();
-          service.invoke('stopService');
-        },
-      );
-
-      WidgetsBinding.instance
-          .addObserver(lifecycleEventHandler); // Stop the periodic task
+      final service = FlutterBackgroundService();
+      service.invoke('stopService');
     }
   }
 
@@ -119,7 +112,10 @@ class _MapPageState extends State<MapPage> {
           updateCircles(_polylineCoordinates);
         });
         widget.mapRepository.sendLocation(
-            position: currentP!, bearerToken: bearerToken!, busId: busId!);
+          position: currentP!,
+          bearerToken: bearerToken!,
+          busId: busId!,
+        );
 
         Workmanager().registerOneOffTask(
           'location_task',
@@ -163,6 +159,7 @@ class _MapPageState extends State<MapPage> {
   void _startTrackingSpeed() async {
     bool serviceEnabled =
         await geoLocator.Geolocator.isLocationServiceEnabled();
+    print(serviceEnabled);
     if (!serviceEnabled) {
       await geoLocator.Geolocator.openLocationSettings();
       return;
@@ -411,6 +408,11 @@ class _MapPageState extends State<MapPage> {
                                             ? "Start tracking your location ?"
                                             : "Stop tracking your location ?",
                                         onConfirm: () {
+                                          widget.mapRepository.sendLocation(
+                                              position: currentP!,
+                                              bearerToken: bearerToken!,
+                                              busId: busId!,
+                                              isStart: _isTracking);
                                           _startTracking();
                                         });
                                   });
@@ -447,12 +449,12 @@ class _MapPageState extends State<MapPage> {
     final permissionGranted =
         await widget.mapRepository.checkAndRequestPermissions();
     bool _hasShownNotification = false;
-    if (!permissionGranted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Permission not granted!')),
-      );
-      return;
-    }
+    // if (!permissionGranted) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Permission not granted!')),
+    //   );
+    //   return;
+    // }
     try {
       final locationStream = widget.mapRepository.getLocationUpdate();
       locationStream.listen((LocationData currentLocation) async {
@@ -463,15 +465,15 @@ class _MapPageState extends State<MapPage> {
                 LatLng(currentLocation.latitude!, currentLocation.longitude!);
             _cameraToPosition(currentP!);
           });
-          var distanceBetweenSourceAndDes =
-              haversineDistance(currentP!, destination!);
-          if (distanceBetweenSourceAndDes < 60 &&
-              _hasShownNotification == false) {
-            setState(() {
-              _hasShownNotification = true;
-            });
-            await widget.mapRepository.sendPushNotification();
-          }
+          // var distanceBetweenSourceAndDes =
+          //     haversineDistance(currentP!, destination!);
+          // if (distanceBetweenSourceAndDes < 60 &&
+          //     _hasShownNotification == false) {
+          //   setState(() {
+          //     _hasShownNotification = true;
+          //   });
+          //   await widget.mapRepository.sendPushNotification();
+          // }
         }
       });
     } catch (e) {
@@ -488,19 +490,8 @@ class _MapPageState extends State<MapPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _elapsedTimeTimer?.cancel();
+    _mapController.future.then((controller) => controller.dispose());
     super.dispose();
-  }
-}
-
-class LifecycleEventHandler extends WidgetsBindingObserver {
-  final Future<void> Function() detachedCallBack;
-
-  LifecycleEventHandler({required this.detachedCallBack});
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached) {
-      detachedCallBack();
-    }
   }
 }
